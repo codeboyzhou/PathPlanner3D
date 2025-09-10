@@ -10,3 +10,6 @@ htmlcov/
 pytest/
 .coverage
 coverage.xml
+
+# Jupyter Notebook files
+.ipynb_checkpoints/
