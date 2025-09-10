@@ -1,5 +1,5 @@
 import numpy as np
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AlgorithmArguments(BaseModel):
@@ -44,6 +44,9 @@ class AlgorithmArguments(BaseModel):
 
 class Particle(BaseModel):
     """A class for a particle in the swarm."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    """Configuration for the model."""
 
     position: np.ndarray
     """The position of the particle.

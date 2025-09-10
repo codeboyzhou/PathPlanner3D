@@ -3,3 +3,10 @@
 
 # Python build files
 *.egg-info/
+__pycache__/
+
+# Coverage files
+htmlcov/
+pytest/
+.coverage
+coverage.xml
