@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "A Python-based research framework for 3D path planning with terrain awareness, including algorithms, simulation, and visualization tools."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "loguru>=0.7.3",
+    "numpy>=2.3.2",
+    "pydantic>=2.11.7",
+]
 
 [dependency-groups]
 dev = [
@@ -12,3 +16,12 @@ dev = [
     "pyright>=1.1.405",
     "ruff>=0.12.12",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["README.md"]
+
+[tool.ruff.lint]
+select = ["C4", "E", "F", "I", "PERF", "UP"]
+ignore = ["PERF203"]
