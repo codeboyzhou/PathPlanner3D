@@ -589,6 +589,7 @@ dependencies = [
     { name = "plotly" },
     { name = "pydantic" },
     { name = "streamlit" },
+    { name = "streamlit-monaco-editor" },
 ]
 
 [package.dev-dependencies]
@@ -608,6 +609,7 @@ requires-dist = [
     { name = "plotly", specifier = ">=6.3.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "streamlit", specifier = ">=1.49.1" },
+    { name = "streamlit-monaco-editor", specifier = ">=0.1.6" },
 ]
 
 [package.metadata.requires-dev]
@@ -1055,6 +1057,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/24/17/c8024e4ef311dc7833987c603a7d0ebe82f8aa352aaca53b27be3f6b7f01/streamlit-1.49.1.tar.gz", hash = "sha256:6f213f1e43f035143a56f58ad50068d8a09482f0a2dad1050d7e7e99a9689818", size = 9640116, upload-time = "2025-08-29T18:35:45.055Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/9e/146cdef515ad07e56c3aa942d087562498592d441aa3bae845ef0cd8fca3/streamlit-1.49.1-py3-none-any.whl", hash = "sha256:ad7b6d0dc35db168587acf96f80378249467fc057ed739a41c511f6bf5aa173b", size = 10044388, upload-time = "2025-08-29T18:35:42.239Z" },
+]
+
+[[package]]
+name = "streamlit-monaco-editor"
+version = "0.1.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/1a/cd3545ebcbc8f07ffe7d84c0837a9fdda8ea0e7325d734c1e67e5484a32f/streamlit_monaco_editor-0.1.6.tar.gz", hash = "sha256:1e2b4d653ae237bc5aba60659bb21f631ec8a8e5a1a0cca6b579dbb860da96aa", size = 164999, upload-time = "2025-07-05T15:10:20.529Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/97/8c8a9831d2fe14e9407c432b91c9a9eea5c345b3745a2fdff27524ad38d6/streamlit_monaco_editor-0.1.6-py3-none-any.whl", hash = "sha256:2147dd8ceaade04e6ea5e53401a9d94abb5345891276a9196c293dccb4828bd0", size = 169724, upload-time = "2025-07-05T15:10:19.279Z" },
 ]
 
 [[package]]

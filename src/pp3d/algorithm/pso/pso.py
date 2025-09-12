@@ -3,7 +3,7 @@ from collections.abc import Callable
 import numpy as np
 from loguru import logger
 
-from pp3d.algorithm.pso.types import AlgorithmArguments, Particle
+from pp3d.algorithm.pso.types import Particle, PSOAlgorithmArguments
 from pp3d.common.types import ProblemType
 
 
@@ -12,14 +12,14 @@ class PSO:
 
     def __init__(
         self,
-        args: AlgorithmArguments,
+        args: PSOAlgorithmArguments,
         fitness_function: Callable[[np.ndarray], float],
         problem_type: ProblemType = ProblemType.MINIMIZATION,
     ) -> None:
         """Initialize the PSO algorithm.
 
         Args:
-            args (AlgorithmArgument): The arguments of the algorithm.
+            args (PSOAlgorithmArguments): The arguments of the algorithm.
             fitness_function (Callable[[np.ndarray], float]): The fitness function.
             problem_type (ProblemType): The type of the problem. Defaults to ProblemType.MINIMIZATION.
         """

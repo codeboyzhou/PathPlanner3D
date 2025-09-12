@@ -1,9 +1,13 @@
+from collections.abc import Callable
+
+import numpy as np
 import streamlit as st
 
-from pp3d.algorithm.pso.types import AlgorithmArguments
+from pp3d.algorithm.pso.pso import PSO
+from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 
 
-def init_pso_args() -> AlgorithmArguments:
+def init_pso_algorithm_args() -> PSOAlgorithmArguments:
     """Initialize PSO algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
@@ -33,7 +37,7 @@ def init_pso_args() -> AlgorithmArguments:
             "Random Seed (0 means None, for non-deterministic)", min_value=0, max_value=1000, value=0, step=1
         )
         verbose = st.checkbox("Verbose")
-        return AlgorithmArguments(
+        return PSOAlgorithmArguments(
             num_particles=num_particles,
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
@@ -47,3 +51,17 @@ def init_pso_args() -> AlgorithmArguments:
             random_seed=random_seed,
             verbose=verbose,
         )
+
+
+def run_pso_algorithm(
+    args: PSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
+) -> tuple[np.ndarray, list[float]]:
+    """Run the PSO algorithm for the 3D Path Planning Playground.
+
+    Args:
+        args (PSOAlgorithmArguments): The PSO algorithm arguments for the 3D Path Planning Playground.
+        fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
+    """
+    pso = PSO(args, fitness_function)
+    best_path_points, best_fitness_values = pso.run()
+    return best_path_points, best_fitness_values

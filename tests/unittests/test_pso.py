@@ -4,7 +4,7 @@ import numpy as np
 
 import pytest
 from pp3d.algorithm.pso.pso import PSO
-from pp3d.algorithm.pso.types import AlgorithmArguments
+from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common.types import ProblemType
 
 
@@ -23,7 +23,7 @@ def maximization_fitness_function() -> Callable[[np.ndarray], float]:
 @pytest.fixture
 def algorithm_args():
     """Define algorithm arguments for testing."""
-    return AlgorithmArguments(
+    return PSOAlgorithmArguments(
         num_particles=10,
         num_waypoints=5,
         max_iterations=10,
