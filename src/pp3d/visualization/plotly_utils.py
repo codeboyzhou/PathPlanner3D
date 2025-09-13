@@ -50,24 +50,53 @@ def _make_path_smooth(path_points: np.ndarray):
     return smooth_path_points
 
 
-def plot_terrain_and_path(xx: np.ndarray, yy: np.ndarray, zz: np.ndarray, path_points: np.ndarray) -> None:
+def plot_terrain_and_path(
+    xx: np.ndarray,
+    yy: np.ndarray,
+    zz: np.ndarray,
+    start_point: np.ndarray,
+    destination: np.ndarray,
+    path_points: np.ndarray,
+) -> None:
     """Plot the terrain and path using Plotly.
 
     Args:
         xx: X coordinates of the terrain.
         yy: Y coordinates of the terrain.
         zz: Z coordinates of the terrain.
+        start_point: Start point of the path.
+        destination: Destination of the path.
         path_points: Path points to be plotted, shape: (n, 3), i.e. [[x1, y1, z1], [x2, y2, z2], ...]
     """
     terrain = graph_objects.Surface(x=xx, y=yy, z=zz, showscale=False)
+
+    start_point_scatter = graph_objects.Scatter3d(
+        x=[start_point[0]],
+        y=[start_point[1]],
+        z=[start_point[2]],
+        mode="markers",
+        marker={"size": 5, "color": "green"},
+        name="Start Point",
+    )
+
+    destination_scatter = graph_objects.Scatter3d(
+        x=[destination[0]],
+        y=[destination[1]],
+        z=[destination[2]],
+        mode="markers",
+        marker={"size": 5, "color": "red"},
+        name="Destination",
+    )
 
     smooth_path_points = _make_path_smooth(path_points)
     smooth_x = smooth_path_points[:, 0]
     smooth_y = smooth_path_points[:, 1]
     smooth_z = smooth_path_points[:, 2]
-    path = graph_objects.Scatter3d(x=smooth_x, y=smooth_y, z=smooth_z, mode="lines")
+    path = graph_objects.Scatter3d(
+        x=smooth_x, y=smooth_y, z=smooth_z, mode="lines", line={"width": 6, "color": "springgreen"}, name="Target Path"
+    )
 
-    fig = graph_objects.Figure(data=[terrain, path])
+    fig = graph_objects.Figure(data=[terrain, path, start_point_scatter, destination_scatter])
     fig.update_layout(
         title="Terrain and Path",
         height=800,

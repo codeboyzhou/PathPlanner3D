@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import numpy as np
 import streamlit as st
+from scipy.interpolate import splev, splrep
 from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
@@ -83,7 +84,7 @@ class Playground:
     def _parse_fitness_function(self) -> Callable[[np.ndarray], float] | None:
         """Parse the input fitness function code to a function."""
         try:
-            allowed_packages = {"np": np}
+            allowed_packages = {"np": np, "splrep": splrep, "splev": splev}
             parsed_fitness_function = {}
             exec(self.input_fitness_function_code, allowed_packages, parsed_fitness_function)
             callable_fitness_function = parsed_fitness_function["fitness_function"]
@@ -146,7 +147,14 @@ class Playground:
             )
 
         xx, yy, zz = self._generate_terrain()
-        plotly_utils.plot_terrain_and_path(xx, yy, zz, best_path_points)
+
+        start_point = np.array([0, 0, 5])
+        destination = np.array([90, 90, 5])
+        best_path_points = np.insert(best_path_points, 0, start_point)
+        best_path_points = np.append(best_path_points, destination)
+        best_path_points = best_path_points.reshape(-1, 3)
+
+        plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, best_path_points)
         plotly_utils.plot_fitness_curve(best_fitness_values)
 
 
