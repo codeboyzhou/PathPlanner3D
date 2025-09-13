@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import numpy as np
 import streamlit as st
+from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
@@ -102,7 +103,7 @@ class Playground:
     def _parse_terrain_generation_function(self) -> Callable[[np.ndarray, np.ndarray], np.ndarray] | None:
         """Parse the input terrain generation function code to a function."""
         try:
-            allowed_packages = {"np": np}
+            allowed_packages = {"np": np, "gaussian_filter": gaussian_filter}
             parsed_terrain_generation_function = {}
             exec(self.input_terrain_generation_code, allowed_packages, parsed_terrain_generation_function)
             callable_terrain_generation_function = parsed_terrain_generation_function["generate_terrain"]

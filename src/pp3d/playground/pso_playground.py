@@ -26,13 +26,13 @@ def init_pso_algorithm_args() -> PSOAlgorithmArguments:
             max_velocity_y = st.number_input("Max Velocity Y", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
             max_velocity_z = st.number_input("Max Velocity Z", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
         with st.expander(label="Axes Min", expanded=True):
-            axes_min_x = st.number_input("Axis Min X", min_value=-100.0, max_value=100.0, value=-10.0, step=1.0)
-            axes_min_y = st.number_input("Axis Min Y", min_value=-100.0, max_value=100.0, value=-10.0, step=1.0)
-            axes_min_z = st.number_input("Axis Min Z", min_value=-100.0, max_value=100.0, value=-10.0, step=1.0)
+            axes_min_x = st.number_input("Axis Min X", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+            axes_min_y = st.number_input("Axis Min Y", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+            axes_min_z = st.number_input("Axis Min Z", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
         with st.expander(label="Axes Max", expanded=True):
-            axes_max_x = st.number_input("Axis Max X", min_value=-100.0, max_value=100.0, value=10.0, step=1.0)
-            axes_max_y = st.number_input("Axis Max Y", min_value=-100.0, max_value=100.0, value=10.0, step=1.0)
-            axes_max_z = st.number_input("Axis Max Z", min_value=-100.0, max_value=100.0, value=10.0, step=1.0)
+            axes_max_x = st.number_input("Axis Max X", min_value=0.0, max_value=100.0, value=100.0, step=1.0)
+            axes_max_y = st.number_input("Axis Max Y", min_value=0.0, max_value=100.0, value=100.0, step=1.0)
+            axes_max_z = st.number_input("Axis Max Z", min_value=0.0, max_value=100.0, value=100.0, step=1.0)
         random_seed = st.number_input(
             "Random Seed (0 means None, for non-deterministic)", min_value=0, max_value=1000, value=0, step=1
         )
