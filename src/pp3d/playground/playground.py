@@ -13,10 +13,8 @@ from pp3d.visualization import plotly_utils
 
 def _init_streamlit_session_state():
     """Initialize the session state of streamlit."""
-    if "terrain_figure_show" not in st.session_state:
-        st.session_state.terrain_figure_show = False
-    if "fitness_curve_figure_show" not in st.session_state:
-        st.session_state.fitness_curve_figure_show = False
+    if "run_algorithm" not in st.session_state:
+        st.session_state.run_algorithm = False
 
 
 def _st_monaco_editor(value: str, language: str = "python", height: str = "480px", theme: str = "vs-dark") -> str:
@@ -68,24 +66,18 @@ class Playground:
             with st.expander(label="Terrain Generation", expanded=False):
                 self.input_terrain_generation_code = _st_monaco_editor(value=TERRAIN_GENERATION_CODE_TEMPLATE)
 
-            button_generate_terrain_clicked = st.button(label="Generate Terrain")
-            if button_generate_terrain_clicked:
-                st.session_state.terrain_figure_show = True
-
             with st.expander(label="Fitness Function", expanded=False):
                 self.input_fitness_function_code = _st_monaco_editor(value=FITNESS_FUNCTION_CODE_TEMPLATE)
 
             button_run_algorithm_clicked = st.button(label="Run Algorithm")
             if button_run_algorithm_clicked:
-                st.session_state.fitness_curve_figure_show = True
+                st.session_state.run_algorithm = True
 
     def _init_right_column(self) -> None:
         """Initialize the right column of the 3D Path Planning Playground."""
         with self.right:
             st.header("📊 Result Visualization")
-            if st.session_state.terrain_figure_show:
-                self._generate_terrain()
-            if st.session_state.fitness_curve_figure_show:
+            if st.session_state.run_algorithm:
                 self._run_algorithm()
 
     def _parse_fitness_function(self) -> Callable[[np.ndarray], float] | None:
@@ -111,30 +103,34 @@ class Playground:
         except Exception as e:
             st.error(f"Error parsing terrain generation code: {e}")
 
-    def _generate_terrain(self) -> None:
-        """Generate the terrain."""
+    def _generate_terrain(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Generate the terrain using the input terrain generation function code.
+
+        Returns:
+            xx (np.ndarray): The x-axis values of the terrain.
+            yy (np.ndarray): The y-axis values of the terrain.
+            zz (np.ndarray): The z-axis values of the terrain.
+        """
         callable_terrain_generation_function = self._parse_terrain_generation_function()
 
         if callable_terrain_generation_function is None:
-            st.error("Error calling terrain generation function: callable_terrain_generation_function is None.")
-            return
+            st.error("Error running algorithm: callable_terrain_generation_function is None.")
+            return np.array([]), np.array([]), np.array([])
 
         axes_min = (0, 0, 0) if self.selected_algorithm_args is None else self.selected_algorithm_args.axes_min
         axes_max = (100, 100, 100) if self.selected_algorithm_args is None else self.selected_algorithm_args.axes_max
-        x = np.linspace(axes_min[0], axes_max[0], 100)
-        y = np.linspace(axes_min[1], axes_max[1], 100)
+        x = np.linspace(start=axes_min[0], stop=axes_max[0], num=100)
+        y = np.linspace(start=axes_min[1], stop=axes_max[1], num=100)
         xx, yy = np.meshgrid(x, y)
-
         zz = callable_terrain_generation_function(xx, yy)
-        fig = plotly_utils.get_terrain_figure(xx, yy, zz)
-        st.plotly_chart(fig, use_container_width=True)
+        return xx, yy, zz
 
     def _run_algorithm(self) -> None:
         """Run the selected algorithm."""
         callable_fitness_function = self._parse_fitness_function()
 
         if callable_fitness_function is None:
-            st.error("Error calling fitness function: callable_fitness_function is None.")
+            st.error("Error running algorithm: callable_fitness_function is None.")
             return
 
         if self.selected_algorithm_args is None:
@@ -149,8 +145,9 @@ class Playground:
                 self.selected_algorithm_args, callable_fitness_function
             )
 
-        fig = plotly_utils.get_fitness_curve_figure(best_fitness_values)
-        st.plotly_chart(fig, use_container_width=True)
+        xx, yy, zz = self._generate_terrain()
+        plotly_utils.plot_terrain_and_path(xx, yy, zz, best_path_points)
+        plotly_utils.plot_fitness_curve(best_fitness_values)
 
 
 if __name__ == "__main__":
