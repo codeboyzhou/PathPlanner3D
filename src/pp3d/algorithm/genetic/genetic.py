@@ -148,11 +148,13 @@ class GeneticAlgorithm:
         """
         arg_func = np.argmin if self.problem_type == ProblemType.MINIMIZATION else np.argmax
         best_individual_index = arg_func(fitness_values)
-        best_individual = self.population[best_individual_index]
+
         best_fitness_value = fitness_values[best_individual_index].item()
+        best_individual = self.population[best_individual_index]
+        best_individual.fitness_value = best_fitness_value
 
         if algorithm_utils.compare_fitness(best_fitness_value, self.best_individual.fitness_value, self.problem_type):
-            self.best_individual = Individual(gene=best_individual.gene, fitness_value=best_fitness_value)
+            self.best_individual = best_individual
 
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the genetic algorithm.
