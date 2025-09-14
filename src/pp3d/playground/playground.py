@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import numpy as np
 import streamlit as st
+from loguru import logger
 from scipy.interpolate import splev, splrep
 from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
@@ -103,6 +104,7 @@ class Playground:
                 "np": np,
                 "splrep": splrep,
                 "splev": splev,
+                "logger": logger,
                 "start_point": start_point,
                 "destination": destination,
                 "terrain_height_map": terrain_height_map,
@@ -141,16 +143,24 @@ class Playground:
             st.error("Error running algorithm: callable_terrain_generation_function is None.")
             return np.array([]), np.array([]), np.array([])
 
-        axes_min = (0, 0, 0) if self.selected_algorithm_args is None else self.selected_algorithm_args.axes_min
-        axes_max = (100, 100, 100) if self.selected_algorithm_args is None else self.selected_algorithm_args.axes_max
+        if self.selected_algorithm_args is None:
+            st.error("Error running algorithm: self.selected_algorithm_args is None.")
+            return np.array([]), np.array([]), np.array([])
+
+        axes_min = self.selected_algorithm_args.axes_min
+        axes_max = self.selected_algorithm_args.axes_max
         x = np.linspace(start=axes_min[0], stop=axes_max[0], num=100)
         y = np.linspace(start=axes_min[1], stop=axes_max[1], num=100)
         xx, yy = np.meshgrid(x, y)
+
         zz = callable_terrain_generation_function(xx, yy)
+
         return xx, yy, zz
 
     def _run_algorithm(self) -> None:
         """Run the selected algorithm."""
+        st.session_state.run_algorithm = False
+
         if self.selected_algorithm_args is None:
             st.error("Error running algorithm: self.selected_algorithm_args is None.")
             return

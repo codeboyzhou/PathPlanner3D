@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable
 
 import numpy as np
@@ -24,12 +25,12 @@ class GeneticAlgorithm:
             fitness_function (Callable[[np.ndarray], float]): The fitness function.
             problem_type (ProblemType): The type of the problem. Defaults to ProblemType.MINIMIZATION.
         """
-        log_level = "DEBUG" if args.verbose else "INFO"
-        logger.level(log_level)
+        logger.remove()
+        logger.add(sink=sys.stdout, level="DEBUG" if args.verbose else "INFO")
 
         logger.info("Initialize genetic algorithm with arguments: {}", args.model_dump_json())
 
-        if args.random_seed is not None:
+        if args.random_seed is not None and args.random_seed > 0:
             np.random.seed(args.random_seed)
             logger.debug(f"Random seed is set to {args.random_seed}")
 
@@ -189,7 +190,7 @@ class GeneticAlgorithm:
 
             self.population = next_population
 
-        logger.info(f"Genetic algorithm finished, best fitness value = {self.best_individual.fitness_value:.6f}")
+        logger.success(f"Genetic algorithm finished, best fitness value = {self.best_individual.fitness_value:.6f}")
 
         # [x1, y1, z1, x2, y2, z2, ...] → [[x1, y1, z1], [x2, y2, z2], ...]
         best_path_points = self.best_individual.gene.reshape(-1, len(self.axes_min))

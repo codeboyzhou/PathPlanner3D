@@ -57,5 +57,7 @@ def fitness_function(path_points: np.ndarray) -> float:
     # Calculate the average height cost
     average_height = np.mean(splev_z)
     
+    logger.info(f"Collision cost: {collision_cost}, Path length: {path_length}, Average height: {average_height}")
+    
     return collision_cost + path_length + average_height
 """.strip()
