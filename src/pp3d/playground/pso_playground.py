@@ -11,7 +11,7 @@ def init_pso_algorithm_args() -> PSOAlgorithmArguments:
     """Initialize PSO algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
-        AlgorithmArguments: The initialized PSO algorithm arguments for the 3D Path Planning Playground.
+        PSOAlgorithmArguments: The initialized PSO algorithm arguments for the 3D Path Planning Playground.
     """
     with st.expander(label="PSO Arguments", expanded=True):
         num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)

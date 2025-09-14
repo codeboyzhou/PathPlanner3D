@@ -30,7 +30,8 @@ def fitness_function(path_points: np.ndarray) -> float:
     start_point = np.array([0, 0, 5])
     destination = np.array([90, 90, 5])
     
-    full_path_points = np.vstack([start_point, path_points, destination]).reshape(-1, 3)
+    reshaped_path_points = path_points.reshape(-1, 3)
+    full_path_points = np.vstack([start_point, reshaped_path_points, destination])
     
     x = full_path_points[:, 0]
     y = full_path_points[:, 1]
