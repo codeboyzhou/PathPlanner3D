@@ -148,7 +148,8 @@ class GeneticAlgorithm:
         if np.random.rand() < self.args.mutation_rate:
             mutation_strength = 0.5 * (1 - current_iteration / self.args.max_iterations)
             noise = np.random.normal(loc=0, scale=mutation_strength, size=self.num_genes)
-            mutated_gene = np.clip(individual.gene + noise, self.axes_min, self.axes_max)
+            mutated_and_reshaped_gene = (individual.gene + noise).reshape(self.shape)
+            mutated_gene = np.clip(mutated_and_reshaped_gene, self.axes_min, self.axes_max).flatten()
             return Individual(gene=mutated_gene, fitness_value=self.initial_fitness_value)
         return individual
 
