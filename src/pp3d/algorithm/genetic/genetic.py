@@ -100,18 +100,9 @@ class GeneticAlgorithm:
         else:
             probabilities = adjusted_fitness / adjusted_fitness.sum()
 
-        # Elitism: preserve the best individual
-        arg_func = np.argmin if self.problem_type == ProblemType.MINIMIZATION else np.argmax
-        best_index = arg_func(fitness_values)
-        elite_individual = self.population[best_index]
-
-        # Select remaining parents using roulette wheel selection
         np_arange = np.arange(self.args.population_size)
         indices = np.random.choice(np_arange, size=self.args.population_size - 1, replace=True, p=probabilities)
         selected_parents = [self.population[i] for i in indices]
-
-        # Add elite individual to the selection
-        selected_parents.append(elite_individual)
 
         return selected_parents
 
@@ -190,8 +181,9 @@ class GeneticAlgorithm:
 
             parents = self._selection(fitness_values)
 
-            next_population: list[Individual] = []
-            for i in range(0, self.args.population_size, 2):
+            next_population: list[Individual] = [self.best_individual]  # Elitism: preserve the best individual directly
+
+            for i in range(0, self.args.population_size - 1, 2):
                 parent1, parent2 = parents[i], parents[i + 1]
                 child1, child2 = self._crossover(parent1, parent2)
                 child1 = self._mutation(child1, iteration)
