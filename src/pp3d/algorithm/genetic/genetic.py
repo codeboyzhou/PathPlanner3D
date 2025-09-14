@@ -87,25 +87,17 @@ class GeneticAlgorithm:
         Returns:
             list[Individual]: The selected parents.
         """
-        if self.problem_type == ProblemType.MINIMIZATION:
-            # For minimization, we want to invert the fitness values
-            # Use `1 / (1 + fitness)` to handle zero values and avoid division by zero
-            adjusted_fitness = 1.0 / (1.0 + fitness_values)
-        else:
-            # For maximization, use the fitness values directly
-            adjusted_fitness = fitness_values.copy()
+        arg_sorted_fitness_values = np.argsort(fitness_values)
+        reversed_sorted = arg_sorted_fitness_values[::-1]
+        ranked_indices = arg_sorted_fitness_values if self.problem_type == ProblemType.MINIMIZATION else reversed_sorted
 
-        # Ensure no negative values
-        if adjusted_fitness.min() < 0:
-            adjusted_fitness = adjusted_fitness - adjusted_fitness.min()
+        probabilities = np.arange(1, self.args.population_size + 1, dtype=float)
+        probabilities = probabilities / probabilities.sum()
 
-        if adjusted_fitness.sum() == 0:
-            probabilities = np.ones(self.args.population_size) / self.args.population_size
-        else:
-            probabilities = adjusted_fitness / adjusted_fitness.sum()
-
-        np_arange = np.arange(self.args.population_size)
-        indices = np.random.choice(np_arange, size=self.args.population_size - 1, replace=True, p=probabilities)
+        # Exclude elite individual before selection
+        indices = np.random.choice(
+            ranked_indices[1:], size=self.args.population_size - 1, replace=True, p=probabilities[1:]
+        )
         selected_parents = [self.population[i] for i in indices]
 
         return selected_parents
