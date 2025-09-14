@@ -8,6 +8,7 @@ from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
+from pp3d.common import collision_detection
 from pp3d.playground import ga_playground, pso_playground
 from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
 from pp3d.visualization import plotly_utils
@@ -84,10 +85,29 @@ class Playground:
             if st.session_state.run_algorithm:
                 self._run_algorithm()
 
-    def _parse_fitness_function(self) -> Callable[[np.ndarray], float] | None:
-        """Parse the input fitness function code to a function."""
+    def _parse_fitness_function(
+        self, start_point: np.ndarray, destination: np.ndarray, terrain_height_map: np.ndarray
+    ) -> Callable[[np.ndarray], float] | None:
+        """Parse the input fitness function code to a function.
+
+        Args:
+            start_point (np.ndarray): The start point of the path.
+            destination (np.ndarray): The destination point of the path.
+            terrain_height_map (np.ndarray): The height map of the terrain.
+
+        Returns:
+            Callable[[np.ndarray], float] | None: The parsed fitness function.
+        """
         try:
-            allowed_packages = {"np": np, "splrep": splrep, "splev": splev}
+            allowed_packages = {
+                "np": np,
+                "splrep": splrep,
+                "splev": splev,
+                "start_point": start_point,
+                "destination": destination,
+                "terrain_height_map": terrain_height_map,
+                "collision_detection": collision_detection,
+            }
             parsed_fitness_function = {}
             exec(self.input_fitness_function_code, allowed_packages, parsed_fitness_function)
             callable_fitness_function = parsed_fitness_function["fitness_function"]
@@ -131,14 +151,19 @@ class Playground:
 
     def _run_algorithm(self) -> None:
         """Run the selected algorithm."""
-        callable_fitness_function = self._parse_fitness_function()
+        if self.selected_algorithm_args is None:
+            st.error("Error running algorithm: self.selected_algorithm_args is None.")
+            return
+
+        start_point = np.array([0, 0, 5])
+        destination = np.array([90, 90, 5])
+
+        xx, yy, zz = self._generate_terrain()
+
+        callable_fitness_function = self._parse_fitness_function(start_point, destination, zz)
 
         if callable_fitness_function is None:
             st.error("Error running algorithm: callable_fitness_function is None.")
-            return
-
-        if self.selected_algorithm_args is None:
-            st.error("Error running algorithm: self.selected_algorithm_args is None.")
             return
 
         best_path_points = np.array([])
@@ -153,10 +178,6 @@ class Playground:
                 self.selected_algorithm_args, callable_fitness_function
             )
 
-        xx, yy, zz = self._generate_terrain()
-
-        start_point = np.array([0, 0, 5])
-        destination = np.array([90, 90, 5])
         full_path_points = np.vstack([start_point, best_path_points, destination])
 
         plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)

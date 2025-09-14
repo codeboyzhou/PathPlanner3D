@@ -27,9 +27,6 @@ def generate_terrain(xx: np.ndarray, yy: np.ndarray) -> np.ndarray:
 # The code template for fitness function
 FITNESS_FUNCTION_CODE_TEMPLATE = """
 def fitness_function(path_points: np.ndarray) -> float:
-    start_point = np.array([0, 0, 5])
-    destination = np.array([90, 90, 5])
-    
     reshaped_path_points = path_points.reshape(-1, 3)
     full_path_points = np.vstack([start_point, reshaped_path_points, destination])
     
@@ -50,10 +47,18 @@ def fitness_function(path_points: np.ndarray) -> float:
     
     full_path_points = np.column_stack((splev_x, splev_y, splev_z))
     
+    # Calculate the collision cost
+    collision_cost = 0
+    for point in full_path_points:
+        if collision_detection.check_collision(point, terrain_height_map):
+            collision_cost += 1000
+    
+    # Calculate the path length cost
     dx, dy, dz = np.diff(splev_x), np.diff(splev_y), np.diff(splev_z)
     path_length = np.sum(np.sqrt(dx**2 + dy**2 + dz**2))
     
+    # Calculate the average height cost
     average_height = np.mean(splev_z)
     
-    return path_length + average_height
+    return collision_cost + path_length + average_height
 """.strip()
