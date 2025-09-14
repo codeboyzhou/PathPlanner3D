@@ -154,13 +154,12 @@ class GeneticAlgorithm:
         Args:
             fitness_values (np.ndarray): The fitness values of the individuals.
         """
-        value_func = np.min if self.problem_type == ProblemType.MINIMIZATION else np.max
-        best_fitness_value = value_func(fitness_values)
+        arg_func = np.argmin if self.problem_type == ProblemType.MINIMIZATION else np.argmax
+        best_individual_index = arg_func(fitness_values)
+        best_individual = self.population[best_individual_index]
+        best_fitness_value = fitness_values[best_individual_index].item()
 
         if algorithm_utils.compare_fitness(best_fitness_value, self.best_individual.fitness_value, self.problem_type):
-            arg_func = np.argmin if self.problem_type == ProblemType.MINIMIZATION else np.argmax
-            best_individual_index = arg_func(fitness_values)
-            best_individual = self.population[best_individual_index]
             self.best_individual = Individual(gene=best_individual.gene, fitness_value=best_fitness_value)
 
     def run(self) -> tuple[np.ndarray, list[float]]:
