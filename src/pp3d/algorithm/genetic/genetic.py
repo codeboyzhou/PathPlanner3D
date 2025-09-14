@@ -33,6 +33,10 @@ class GeneticAlgorithm:
             np.random.seed(args.random_seed)
             logger.debug(f"Random seed is set to {args.random_seed}")
 
+        if args.population_size % 2 != 0:
+            args.population_size += 1
+            logger.warning(f"Population size is set to {args.population_size} to be even")
+
         self.args = args
         self.fitness_function = fitness_function
         self.problem_type = problem_type
