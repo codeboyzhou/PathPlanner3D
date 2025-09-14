@@ -48,14 +48,11 @@ def fitness_function(path_points: np.ndarray) -> float:
     full_path_points = np.column_stack((splev_x, splev_y, splev_z))
     
     # Calculate the collision cost
-    collision_cost = 0
-    for point in full_path_points:
-        if collision_detection.check_collision(point, terrain_height_map):
-            collision_cost += 1000
+    collision_cost = np.sum([1e4 if collision_detection.check(p, terrain_height_map) else 0 for p in full_path_points])
     
     # Calculate the path length cost
-    dx, dy, dz = np.diff(splev_x), np.diff(splev_y), np.diff(splev_z)
-    path_length = np.sum(np.sqrt(dx**2 + dy**2 + dz**2))
+    path_diff = np.diff(full_path_points, axis=0)
+    path_length = np.sum(np.sqrt(np.sum(path_diff**2, axis=1)))
     
     # Calculate the average height cost
     average_height = np.mean(splev_z)

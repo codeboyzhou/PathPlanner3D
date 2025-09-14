@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def check_collision(point: np.ndarray, terrain_height_map: np.ndarray) -> bool:
+def check(point: np.ndarray, terrain_height_map: np.ndarray) -> bool:
     """
     Check if the path points collide with the terrain.
 
@@ -18,8 +18,8 @@ def check_collision(point: np.ndarray, terrain_height_map: np.ndarray) -> bool:
     idx_x = int(np.round(point_x))
     idx_y = int(np.round(point_y))
 
-    if not (0 <= idx_x < terrain_height_map_rows and 0 <= idx_y < terrain_height_map_cols):
-        return False
+    if 0 <= idx_x < terrain_height_map_rows and 0 <= idx_y < terrain_height_map_cols:
+        terrain_height = terrain_height_map[idx_x, idx_y]
+        return point_z <= terrain_height * 1.1
 
-    terrain_height = terrain_height_map[idx_x, idx_y]
-    return point_z <= terrain_height * 1.1
+    return False

@@ -15,10 +15,10 @@ def init_pso_algorithm_args() -> PSOAlgorithmArguments:
     """
     with st.expander(label="PSO Arguments", expanded=True):
         num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)
-        num_waypoints = st.number_input("Number of Waypoints", min_value=5, max_value=100, value=5, step=5)
+        num_waypoints = st.number_input("Number of Waypoints", min_value=2, max_value=50, value=4, step=1)
         max_iterations = st.number_input("Max Iterations", min_value=10, max_value=1000, value=100, step=10)
-        inertia_weight_min = st.number_input("Min Inertia Weight", min_value=0.1, max_value=1.0, value=0.4, step=0.1)
-        inertia_weight_max = st.number_input("Max Inertia Weight", min_value=0.1, max_value=1.0, value=0.9, step=0.1)
+        inertia_weight_min = st.number_input("Min Inertia Weight", min_value=0.1, max_value=2.0, value=0.4, step=0.1)
+        inertia_weight_max = st.number_input("Max Inertia Weight", min_value=0.1, max_value=2.0, value=0.9, step=0.1)
         cognitive_weight = st.number_input("Cognitive Weight", min_value=0.1, max_value=2.1, value=1.5, step=0.1)
         social_weight = st.number_input("Social Weight", min_value=0.1, max_value=2.1, value=1.5, step=0.1)
         with st.expander(label="Max Velocities", expanded=True):
