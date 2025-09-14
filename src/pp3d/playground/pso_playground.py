@@ -15,7 +15,7 @@ def init_pso_algorithm_args() -> PSOAlgorithmArguments:
     """
     with st.expander(label="PSO Arguments", expanded=True):
         num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)
-        num_waypoints = st.number_input("Number of Waypoints", min_value=5, max_value=100, value=10, step=5)
+        num_waypoints = st.number_input("Number of Waypoints", min_value=5, max_value=100, value=5, step=5)
         max_iterations = st.number_input("Max Iterations", min_value=10, max_value=1000, value=100, step=10)
         inertia_weight_min = st.number_input("Min Inertia Weight", min_value=0.1, max_value=1.0, value=0.4, step=0.1)
         inertia_weight_max = st.number_input("Max Inertia Weight", min_value=0.1, max_value=1.0, value=0.9, step=0.1)

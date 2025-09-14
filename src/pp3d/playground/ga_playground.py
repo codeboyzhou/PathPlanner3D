@@ -15,7 +15,7 @@ def init_genetic_algorithm_args() -> GeneticAlgorithmArguments:
     """
     with st.expander(label="GA Arguments", expanded=True):
         population_size = st.number_input("Population Size", min_value=1, max_value=1000, value=100)
-        num_waypoints = st.number_input("Number of Waypoints", min_value=5, max_value=100, value=10, step=5)
+        num_waypoints = st.number_input("Number of Waypoints", min_value=5, max_value=100, value=5, step=5)
         max_iterations = st.number_input("Max Iterations", min_value=10, max_value=1000, value=100, step=10)
         crossover_rate = st.number_input("Crossover Rate", min_value=0.0, max_value=1.0, value=0.8)
         mutation_rate = st.number_input("Mutation Rate", min_value=0.0, max_value=1.0, value=0.1)
