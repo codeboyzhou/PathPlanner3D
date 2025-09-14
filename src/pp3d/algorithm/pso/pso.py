@@ -4,6 +4,7 @@ import numpy as np
 from loguru import logger
 
 from pp3d.algorithm.pso.types import Particle, PSOAlgorithmArguments
+from pp3d.common import algorithm_utils
 from pp3d.common.types import ProblemType
 
 
@@ -119,31 +120,17 @@ class PSO:
         fitness_values = [self.fitness_function(particle.position) for particle in self.particles]
 
         for i, particle in enumerate(self.particles):
-            current_fitness_value = fitness_values[i]
-
             # Update individual best position and fitness value
-            if self._compare_fitness_values(current_fitness_value, particle.best_fitness_value):
+            if algorithm_utils.compare_fitness(fitness_values[i], particle.best_fitness_value, self.problem_type):
                 logger.debug(f"Particle {i + 1} updated its best position and fitness value")
-                particle.best_fitness_value = current_fitness_value
+                particle.best_fitness_value = fitness_values[i]
                 particle.best_position = particle.position.copy()
 
             # Update global best position and fitness value
-            if self._compare_fitness_values(current_fitness_value, self.global_best_fitness_value):
+            if algorithm_utils.compare_fitness(fitness_values[i], self.global_best_fitness_value, self.problem_type):
                 logger.debug(f"Particle {i + 1} updated the global best position and fitness value")
-                self.global_best_fitness_value = current_fitness_value
+                self.global_best_fitness_value = fitness_values[i]
                 self.global_best_position = particle.position.copy()
-
-    def _compare_fitness_values(self, fitness1: float, fitness2: float) -> bool:
-        """Compare two fitness values by the problem type.
-
-        Args:
-            fitness1 (float): The fitness value.
-            fitness2 (float): The another fitness value.
-
-        Returns:
-            bool: True if fitness1 is better than fitness2, False otherwise.
-        """
-        return fitness1 < fitness2 if self.problem_type == ProblemType.MINIMIZATION else fitness1 > fitness2
 
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the PSO algorithm.

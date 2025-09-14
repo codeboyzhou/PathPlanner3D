@@ -61,26 +61,6 @@ def test_pso_initialization_with_maximization(algorithm_args, minimization_fitne
     assert pso.global_best_fitness_value is not None
 
 
-def test_compare_fitness_values_minimization(algorithm_args, minimization_fitness_function):
-    """Test fitness comparison for minimization problem."""
-    pso = PSO(algorithm_args, minimization_fitness_function, ProblemType.MINIMIZATION)
-
-    # For minimization, smaller values are better
-    assert pso._compare_fitness_values(1.0, 2.0)
-    assert not pso._compare_fitness_values(2.0, 1.0)
-    assert not pso._compare_fitness_values(1.0, 1.0)
-
-
-def test_compare_fitness_values_maximization(algorithm_args, minimization_fitness_function):
-    """Test fitness comparison for maximization problem."""
-    pso = PSO(algorithm_args, minimization_fitness_function, ProblemType.MAXIMIZATION)
-
-    # For maximization, larger values are better
-    assert pso._compare_fitness_values(2.0, 1.0)
-    assert not pso._compare_fitness_values(1.0, 2.0)
-    assert not pso._compare_fitness_values(2.0, 2.0)
-
-
 def test_run_minimization(algorithm_args, minimization_fitness_function):
     """Test running PSO for a minimization problem."""
     pso = PSO(algorithm_args, minimization_fitness_function, ProblemType.MINIMIZATION)
