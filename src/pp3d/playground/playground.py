@@ -150,11 +150,9 @@ class Playground:
 
         start_point = np.array([0, 0, 5])
         destination = np.array([90, 90, 5])
-        best_path_points = np.insert(best_path_points, 0, start_point)
-        best_path_points = np.append(best_path_points, destination)
-        best_path_points = best_path_points.reshape(-1, 3)
+        full_path_points = np.vstack([start_point, best_path_points, destination]).reshape(-1, 3)
 
-        plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, best_path_points)
+        plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
         plotly_utils.plot_fitness_curve(best_fitness_values)
 
 

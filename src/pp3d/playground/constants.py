@@ -26,19 +26,17 @@ def generate_terrain(xx: np.ndarray, yy: np.ndarray) -> np.ndarray:
 
 # The code template for fitness function
 FITNESS_FUNCTION_CODE_TEMPLATE = """
-def fitness_function(path_point_positions: np.ndarray) -> float:
+def fitness_function(path_points: np.ndarray) -> float:
     start_point = np.array([0, 0, 5])
     destination = np.array([90, 90, 5])
     
-    path_point_positions = np.insert(path_point_positions, 0, start_point)
-    path_point_positions = np.append(path_point_positions, destination)
-    waypoints = path_point_positions.reshape(-1, 3)
+    full_path_points = np.vstack([start_point, path_points, destination]).reshape(-1, 3)
     
-    x = waypoints[:, 0]
-    y = waypoints[:, 1]
-    z = waypoints[:, 2]
+    x = full_path_points[:, 0]
+    y = full_path_points[:, 1]
+    z = full_path_points[:, 2]
     
-    splreps = np.linspace(0, 1, len(waypoints))
+    splreps = np.linspace(0, 1, len(full_path_points))
     splevs = np.linspace(0, 1, 100)
     
     splrep_x = splrep(splreps, x)
@@ -49,7 +47,7 @@ def fitness_function(path_point_positions: np.ndarray) -> float:
     splev_y = splev(splevs, splrep_y)
     splev_z = splev(splevs, splrep_z)
     
-    waypoints = np.column_stack((splev_x, splev_y, splev_z))
+    full_path_points = np.column_stack((splev_x, splev_y, splev_z))
     
     dx, dy, dz = np.diff(splev_x), np.diff(splev_y), np.diff(splev_z)
     path_length = np.sum(np.sqrt(dx**2 + dy**2 + dz**2))
