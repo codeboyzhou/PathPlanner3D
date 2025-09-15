@@ -3,7 +3,7 @@ from collections.abc import Callable
 import numpy as np
 
 import pytest
-from pp3d.algorithm.pso.pso import PSO
+from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common.types import ProblemType
 
@@ -41,7 +41,7 @@ def algorithm_args():
 
 def test_pso_initialization(algorithm_args, minimization_fitness_function):
     """Test PSO initialization with default minimization problem type."""
-    pso = PSO(algorithm_args, minimization_fitness_function)
+    pso = PSOAlgorithm(algorithm_args, minimization_fitness_function)
 
     # Check that the PSO object is correctly initialized
     assert pso.problem_type == ProblemType.MINIMIZATION
@@ -52,7 +52,7 @@ def test_pso_initialization(algorithm_args, minimization_fitness_function):
 
 def test_pso_initialization_with_maximization(algorithm_args, minimization_fitness_function):
     """Test PSO initialization with maximization problem type."""
-    pso = PSO(algorithm_args, minimization_fitness_function, ProblemType.MAXIMIZATION)
+    pso = PSOAlgorithm(algorithm_args, minimization_fitness_function, ProblemType.MAXIMIZATION)
 
     # Check that the PSO object is correctly initialized with maximization
     assert pso.problem_type == ProblemType.MAXIMIZATION
@@ -63,7 +63,7 @@ def test_pso_initialization_with_maximization(algorithm_args, minimization_fitne
 
 def test_run_minimization(algorithm_args, minimization_fitness_function):
     """Test running PSO for a minimization problem."""
-    pso = PSO(algorithm_args, minimization_fitness_function, ProblemType.MINIMIZATION)
+    pso = PSOAlgorithm(algorithm_args, minimization_fitness_function, ProblemType.MINIMIZATION)
 
     # Run the PSO algorithm
     best_path_points, best_fitness_values = pso.run()
@@ -78,7 +78,7 @@ def test_run_minimization(algorithm_args, minimization_fitness_function):
 
 def test_run_maximization(algorithm_args, maximization_fitness_function):
     """Test running PSO for a maximization problem."""
-    pso = PSO(algorithm_args, maximization_fitness_function, ProblemType.MAXIMIZATION)
+    pso = PSOAlgorithm(algorithm_args, maximization_fitness_function, ProblemType.MAXIMIZATION)
 
     # Run the PSO algorithm
     best_path_points, best_fitness_values = pso.run()

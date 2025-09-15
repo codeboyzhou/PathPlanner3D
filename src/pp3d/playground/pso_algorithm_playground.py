@@ -3,7 +3,7 @@ from collections.abc import Callable
 import numpy as np
 import streamlit as st
 
-from pp3d.algorithm.pso.pso import PSO
+from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 
 
@@ -62,6 +62,6 @@ def run_pso_algorithm(
         args (PSOAlgorithmArguments): The PSO algorithm arguments for the 3D Path Planning Playground.
         fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
     """
-    pso = PSO(args, fitness_function)
+    pso = PSOAlgorithm(args, fitness_function)
     best_path_points, best_fitness_values = pso.run()
     return best_path_points, best_fitness_values

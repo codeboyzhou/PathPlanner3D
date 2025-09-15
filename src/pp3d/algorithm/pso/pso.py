@@ -9,7 +9,7 @@ from pp3d.common import algorithm_utils
 from pp3d.common.types import ProblemType
 
 
-class PSO:
+class PSOAlgorithm:
     """The implementation of standard PSO (Particle Swarm Optimization) algorithm."""
 
     def __init__(
@@ -78,6 +78,44 @@ class PSO:
         logger.debug(f"Evaluated global best position: {self.global_best_position}")
         logger.debug(f"Evaluated global best fitness value: {self.global_best_fitness_value}")
 
+    def _get_inertia_weight(self, current_iteration: int) -> float:
+        """Get the inertia weight for the current iteration.
+
+        Args:
+            current_iteration (int): The current iteration of the algorithm.
+
+        Returns:
+            float: The inertia weight for the current iteration.
+        """
+        # Use linearly decreasing inertia weight
+        inertia_weight_diff = self.args.inertia_weight_max - self.args.inertia_weight_min
+        iteration_progress = current_iteration / self.args.max_iterations
+        inertia_weight = self.args.inertia_weight_max - inertia_weight_diff * iteration_progress
+        logger.debug(f"Iteration {current_iteration}/{self.args.max_iterations}, inertia_weight = {inertia_weight}")
+        return inertia_weight
+
+    def _get_cognitive_weight(self, current_iteration: int) -> float:
+        """Get the cognitive weight for the current iteration.
+
+        Args:
+            current_iteration (int): The current iteration of the algorithm.
+
+        Returns:
+            float: The cognitive weight for the current iteration.
+        """
+        return self.args.cognitive_weight
+
+    def _get_social_weight(self, current_iteration: int) -> float:
+        """Get the social weight for the current iteration.
+
+        Args:
+            current_iteration (int): The current iteration of the algorithm.
+
+        Returns:
+            float: The social weight for the current iteration.
+        """
+        return self.args.social_weight
+
     def _update_particle_velocities_and_positions(self, current_iteration: int) -> None:
         """Update the velocities and positions of the particles.
 
@@ -86,19 +124,17 @@ class PSO:
         """
         logger.debug(f"Updating particle velocities and positions for iteration {current_iteration}...")
 
-        # Use linearly decreasing inertia weight
-        inertia_weight_diff = self.args.inertia_weight_max - self.args.inertia_weight_min
-        iteration_progress = current_iteration / self.args.max_iterations
-        inertia_weight = self.args.inertia_weight_max - inertia_weight_diff * iteration_progress
-        logger.debug(f"Iteration {current_iteration}/{self.args.max_iterations}, inertia_weight = {inertia_weight}")
+        inertia_weight = self._get_inertia_weight(current_iteration)
+        cognitive_weight = self._get_cognitive_weight(current_iteration)
+        social_weight = self._get_social_weight(current_iteration)
 
         for particle in self.particles:
             r1 = np.random.rand(self.shape[0], self.shape[1]).flatten()
             r2 = np.random.rand(self.shape[0], self.shape[1]).flatten()
 
             # Update velocity
-            cognitive_velocity = self.args.cognitive_weight * r1 * (particle.best_position - particle.position)
-            social_velocity = self.args.social_weight * r2 * (self.global_best_position - particle.position)
+            cognitive_velocity = cognitive_weight * r1 * (particle.best_position - particle.position)
+            social_velocity = social_weight * r2 * (self.global_best_position - particle.position)
             particle.velocity = inertia_weight * particle.velocity + cognitive_velocity + social_velocity
             # Clip velocity
             reshaped_velocity = particle.velocity.reshape(self.shape)

@@ -9,7 +9,7 @@ from streamlit_monaco_editor import st_monaco
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common import collision_detection, interpolates
-from pp3d.playground import ga_playground, pso_playground
+from pp3d.playground import genetic_algorithm_playground, pso_algorithm_playground
 from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
 from pp3d.visualization import plotly_utils
 
@@ -59,9 +59,9 @@ class Playground:
             st.header("⚙️ Algorithm Settings")
             self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA"])
             if self.selected_algorithm == "PSO":
-                self.selected_algorithm_args = pso_playground.init_pso_algorithm_args()
+                self.selected_algorithm_args = pso_algorithm_playground.init_pso_algorithm_args()
             elif self.selected_algorithm == "GA":
-                self.selected_algorithm_args = ga_playground.init_genetic_algorithm_args()
+                self.selected_algorithm_args = genetic_algorithm_playground.init_genetic_algorithm_args()
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
@@ -182,11 +182,11 @@ class Playground:
         best_fitness_values = []
 
         if self.selected_algorithm == "PSO" and isinstance(self.selected_algorithm_args, PSOAlgorithmArguments):
-            best_path_points, best_fitness_values = pso_playground.run_pso_algorithm(
+            best_path_points, best_fitness_values = pso_algorithm_playground.run_pso_algorithm(
                 self.selected_algorithm_args, callable_fitness_function
             )
         elif self.selected_algorithm == "GA" and isinstance(self.selected_algorithm_args, GeneticAlgorithmArguments):
-            best_path_points, best_fitness_values = ga_playground.run_genetic_algorithm(
+            best_path_points, best_fitness_values = genetic_algorithm_playground.run_genetic_algorithm(
                 self.selected_algorithm_args, callable_fitness_function
             )
 
