@@ -28,6 +28,7 @@ class DynamicWeightsPSOAlgorithm(PSOAlgorithm):
         """
         super().__init__(args, fitness_function, problem_type)
         self.args = args
+        logger.success(f"Dynamic weights PSO algorithm initialized with {args}")
 
     @override
     def _get_inertia_weight(self, current_iteration: int) -> float:
