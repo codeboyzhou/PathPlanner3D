@@ -35,5 +35,12 @@ select = ["C4", "E", "F", "I", "PERF", "UP"]
 ignore = ["PERF203"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "--cov=pp3d --cov-report=term --cov-report=html --cov-report=xml --html=pytest/report.html"
+testpaths = ["tests/unittests"]
+addopts = "--cov=src/pp3d --cov-report=term --cov-report=html --cov-report=xml --html=pytest/report.html"
+
+[tool.coverage.run]
+branch = true
+source = ["src/pp3d"]
+
+[tool.coverage.report]
+show_missing = true
