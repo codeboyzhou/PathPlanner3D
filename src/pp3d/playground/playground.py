@@ -3,13 +3,12 @@ from collections.abc import Callable
 import numpy as np
 import streamlit as st
 from loguru import logger
-from scipy.interpolate import splev, splrep
 from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
-from pp3d.common import collision_detection
+from pp3d.common import collision_detection, interpolates
 from pp3d.playground import ga_playground, pso_playground
 from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
 from pp3d.visualization import plotly_utils
@@ -87,14 +86,16 @@ class Playground:
                 self._run_algorithm()
 
     def _parse_fitness_function(
-        self, start_point: np.ndarray, destination: np.ndarray, terrain_height_map: np.ndarray
+        self, start_point: np.ndarray, destination: np.ndarray, xx: np.ndarray, yy: np.ndarray, zz: np.ndarray
     ) -> Callable[[np.ndarray], float] | None:
         """Parse the input fitness function code to a function.
 
         Args:
             start_point (np.ndarray): The start point of the path.
             destination (np.ndarray): The destination point of the path.
-            terrain_height_map (np.ndarray): The height map of the terrain.
+            xx (np.ndarray): The x coordinates of the terrain height map.
+            yy (np.ndarray): The y coordinates of the terrain height map.
+            zz (np.ndarray): The z coordinates of the terrain height map.
 
         Returns:
             Callable[[np.ndarray], float] | None: The parsed fitness function.
@@ -102,12 +103,13 @@ class Playground:
         try:
             allowed_packages = {
                 "np": np,
-                "splrep": splrep,
-                "splev": splev,
+                "xx": xx,
+                "yy": yy,
+                "zz": zz,
                 "logger": logger,
+                "interpolates": interpolates,
                 "start_point": start_point,
                 "destination": destination,
-                "terrain_height_map": terrain_height_map,
                 "collision_detection": collision_detection,
             }
             parsed_fitness_function = {}
@@ -170,7 +172,7 @@ class Playground:
 
         xx, yy, zz = self._generate_terrain()
 
-        callable_fitness_function = self._parse_fitness_function(start_point, destination, zz)
+        callable_fitness_function = self._parse_fitness_function(start_point, destination, xx, yy, zz)
 
         if callable_fitness_function is None:
             st.error("Error running algorithm: callable_fitness_function is None.")

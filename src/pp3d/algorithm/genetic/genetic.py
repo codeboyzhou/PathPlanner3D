@@ -88,18 +88,13 @@ class GeneticAlgorithm:
         Returns:
             list[Individual]: The selected parents.
         """
-        # Rank selection by fitness values
-        sorted_fitness_values = np.argsort(fitness_values)
-        sorted_by_reversed = sorted_fitness_values[::-1]
-        ranked_indices = sorted_fitness_values if self.problem_type == ProblemType.MINIMIZATION else sorted_by_reversed
-
-        current_population_size = len(fitness_values)
-        probabilities = np.arange(1, current_population_size + 1, dtype=float)
-        probabilities = probabilities / probabilities.sum()
-
-        indices = np.random.choice(ranked_indices, size=current_population_size, replace=True, p=probabilities)
-        selected_parents = [self.population[i] for i in indices]
-
+        selected_parents: list[Individual] = []
+        while len(selected_parents) < self.args.population_size:
+            tournament_indices = np.random.choice(len(self.population), size=self.args.tournament_size, replace=False)
+            tournament_fitness_values = fitness_values[tournament_indices]
+            arg_func = np.argmin if self.problem_type == ProblemType.MINIMIZATION else np.argmax
+            winner_index = tournament_indices[arg_func(tournament_fitness_values)]
+            selected_parents.append(self.population[winner_index])
         return selected_parents
 
     def _crossover(self, parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
@@ -171,7 +166,7 @@ class GeneticAlgorithm:
             self._update_best_solution(fitness_values)
 
             best_fitness_values.append(self.best_individual.fitness_value)
-            logger.debug(
+            logger.info(
                 f"Iteration {iteration + 1}/{self.args.max_iterations}, "
                 f"best fitness value = {self.best_individual.fitness_value:.6f}"
             )

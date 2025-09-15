@@ -1,7 +1,8 @@
 import numpy as np
 import streamlit as st
 from plotly import graph_objects
-from scipy.interpolate import make_interp_spline
+
+from pp3d.common import interpolates
 
 
 def _calculate_camera_eye(elev: float, azim: float, distance: float = 2.5) -> dict:
@@ -24,30 +25,6 @@ def _calculate_camera_eye(elev: float, azim: float, distance: float = 2.5) -> di
     y = np.cos(elev_rad) * np.sin(azim_rad) * distance
     z = np.sin(elev_rad) * distance
     return {"x": x, "y": y, "z": z}
-
-
-def _make_path_smooth(path_points: np.ndarray):
-    """Make the path smooth using B-spline.
-
-    Args:
-        path_points: Path points to be smoothed, shape: (n, 3), i.e. [[x1, y1, z1], [x2, y2, z2], ...]
-    """
-    x = path_points[:, 0]
-    y = path_points[:, 1]
-    z = path_points[:, 2]
-
-    t = np.linspace(start=0, stop=1, num=len(x))
-    x_spline = make_interp_spline(t, x, k=3)
-    y_spline = make_interp_spline(t, y, k=3)
-    z_spline = make_interp_spline(t, z, k=3)
-
-    t_new = np.linspace(start=t.min(), stop=t.max(), num=100)
-    x_smooth = x_spline(t_new)
-    y_smooth = y_spline(t_new)
-    z_smooth = z_spline(t_new)
-
-    smooth_path_points = np.column_stack((x_smooth, y_smooth, z_smooth))
-    return smooth_path_points
 
 
 def plot_terrain_and_path(
@@ -88,10 +65,8 @@ def plot_terrain_and_path(
         name="Destination",
     )
 
-    smooth_path_points = _make_path_smooth(path_points)
-    smooth_x = smooth_path_points[:, 0]
-    smooth_y = smooth_path_points[:, 1]
-    smooth_z = smooth_path_points[:, 2]
+    smooth_path_points = interpolates.smooth_path_with_cubic_spline(path_points)
+    smooth_x, smooth_y, smooth_z = smooth_path_points[:, 0], smooth_path_points[:, 1], smooth_path_points[:, 2]
     path = graph_objects.Scatter3d(
         x=smooth_x, y=smooth_y, z=smooth_z, mode="lines", line={"width": 6, "color": "springgreen"}, name="Target Path"
     )

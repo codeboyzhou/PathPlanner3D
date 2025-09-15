@@ -150,7 +150,7 @@ class PSO:
 
             best_fitness_values.append(self.global_best_fitness_value)
 
-            logger.debug(
+            logger.info(
                 f"Iteration {iteration + 1}/{self.args.max_iterations}, "
                 f"best fitness value = {self.global_best_fitness_value:.6f}"
             )

@@ -14,7 +14,8 @@ def init_genetic_algorithm_args() -> GeneticAlgorithmArguments:
         GeneticAlgorithmArguments: The initialized genetic algorithm arguments for the 3D Path Planning Playground.
     """
     with st.expander(label="GA Arguments", expanded=True):
-        population_size = st.number_input("Population Size", min_value=1, max_value=1000, value=100)
+        population_size = st.number_input("Population Size", min_value=1, max_value=1000, value=100, step=1)
+        tournament_size = st.number_input("Tournament Size", min_value=2, max_value=10, value=3, step=1)
         num_waypoints = st.number_input("Number of Waypoints", min_value=2, max_value=50, value=4, step=1)
         max_iterations = st.number_input("Max Iterations", min_value=10, max_value=1000, value=100, step=10)
         crossover_rate = st.number_input("Crossover Rate", min_value=0.0, max_value=1.0, value=0.8)
@@ -33,6 +34,7 @@ def init_genetic_algorithm_args() -> GeneticAlgorithmArguments:
         verbose = st.checkbox("Verbose")
         return GeneticAlgorithmArguments(
             population_size=population_size,
+            tournament_size=tournament_size,
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
             crossover_rate=crossover_rate,

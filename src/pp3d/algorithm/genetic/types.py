@@ -10,6 +10,9 @@ class GeneticAlgorithmArguments(AlgorithmArguments):
     population_size: int
     """The population size of the genetic algorithm."""
 
+    tournament_size: int = 3
+    """The tournament size of the genetic algorithm. Defaults to 3."""
+
     crossover_rate: float
     """The crossover rate of the genetic algorithm."""
 
