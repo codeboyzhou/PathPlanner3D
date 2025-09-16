@@ -36,7 +36,19 @@ ignore = ["PERF203"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/unittests"]
-addopts = "--cov=src/pp3d --cov-report=term --cov-report=html --cov-report=xml --html=pytest/report.html"
+addopts = """
+--cov=src/pp3d/algorithm
+--cov=src/pp3d/algorithm/genetic
+--cov=src/pp3d/algorithm/hybrid
+--cov=src/pp3d/algorithm/pso
+--cov=src/pp3d/common
+--cov=src/pp3d/playground
+--cov=src/pp3d/visualization
+--cov-report=term
+--cov-report=html
+--cov-report=xml
+--html=pytest/report.html
+"""
 
 [tool.coverage.run]
 branch = true
