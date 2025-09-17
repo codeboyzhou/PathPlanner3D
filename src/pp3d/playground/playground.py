@@ -7,11 +7,11 @@ from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
-from pp3d.algorithm.hybrid.types import DynamicWeightsPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common import collision_detection, interpolates
 from pp3d.playground import (
-    dynamic_weights_pso_algorithm_playground,
+    dynamic_pso_algorithm_playground,
     genetic_algorithm_playground,
     pso_algorithm_playground,
 )
@@ -49,7 +49,9 @@ class Playground:
         self.left, self.middle, self.right = st.columns([2, 4, 4])
 
         self.selected_algorithm: str = "PSO"
-        self.selected_algorithm_args: PSOAlgorithmArguments | GeneticAlgorithmArguments | None = None
+        self.selected_algorithm_args: (
+            PSOAlgorithmArguments | GeneticAlgorithmArguments | DynamicPSOAlgorithmArguments | None
+        ) = None
         self.input_terrain_generation_code: str = TERRAIN_GENERATION_CODE_TEMPLATE
         self.input_fitness_function_code: str = FITNESS_FUNCTION_CODE_TEMPLATE
 
@@ -62,13 +64,13 @@ class Playground:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
             st.header("⚙️ Algorithm Settings")
-            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "Dynamic Weights PSO"])
+            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "Dynamic PSO"])
             if self.selected_algorithm == "PSO":
                 self.selected_algorithm_args = pso_algorithm_playground.init_pso_algorithm_args()
             elif self.selected_algorithm == "GA":
                 self.selected_algorithm_args = genetic_algorithm_playground.init_genetic_algorithm_args()
-            elif self.selected_algorithm == "Dynamic Weights PSO":
-                self.selected_algorithm_args = dynamic_weights_pso_algorithm_playground.init_pso_algorithm_args()
+            elif self.selected_algorithm == "Dynamic PSO":
+                self.selected_algorithm_args = dynamic_pso_algorithm_playground.init_pso_algorithm_args()
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
@@ -198,8 +200,8 @@ class Playground:
             best_path_points, best_fitness_values = genetic_algorithm_playground.run_genetic_algorithm(
                 args, callable_fitness_function
             )
-        elif algorithm == "Dynamic Weights PSO" and isinstance(args, DynamicWeightsPSOAlgorithmArguments):
-            best_path_points, best_fitness_values = dynamic_weights_pso_algorithm_playground.run_pso_algorithm(
+        elif algorithm == "Dynamic PSO" and isinstance(args, DynamicPSOAlgorithmArguments):
+            best_path_points, best_fitness_values = dynamic_pso_algorithm_playground.run_pso_algorithm(
                 args, callable_fitness_function
             )
 
