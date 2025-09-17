@@ -3,11 +3,11 @@ from collections.abc import Callable
 import numpy as np
 import streamlit as st
 
-from pp3d.algorithm.hybrid.dynamic_pso import DynamicPSOAlgorithm
+from pp3d.algorithm.hybrid.pso_ga_hybrid import DynamicPSOAlgorithm
 from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
 
 
-def init_pso_algorithm_args() -> DynamicPSOAlgorithmArguments:
+def init_algorithm_args() -> DynamicPSOAlgorithmArguments:
     """Initialize Dynamic PSO algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
@@ -61,7 +61,7 @@ def init_pso_algorithm_args() -> DynamicPSOAlgorithmArguments:
         )
 
 
-def run_pso_algorithm(
+def run_algorithm(
     args: DynamicPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
 ) -> tuple[np.ndarray, list[float]]:
     """Run the Dynamic PSO algorithm for the 3D Path Planning Playground.

@@ -11,9 +11,9 @@ from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common import collision_detection, interpolates
 from pp3d.playground import (
-    dynamic_pso_algorithm_playground,
     genetic_algorithm_playground,
     pso_algorithm_playground,
+    pso_ga_hybrid_playground,
 )
 from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
 from pp3d.visualization import plotly_utils
@@ -64,13 +64,13 @@ class Playground:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
             st.header("⚙️ Algorithm Settings")
-            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "Dynamic PSO"])
+            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO+GA"])
             if self.selected_algorithm == "PSO":
-                self.selected_algorithm_args = pso_algorithm_playground.init_pso_algorithm_args()
+                self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args()
             elif self.selected_algorithm == "GA":
-                self.selected_algorithm_args = genetic_algorithm_playground.init_genetic_algorithm_args()
-            elif self.selected_algorithm == "Dynamic PSO":
-                self.selected_algorithm_args = dynamic_pso_algorithm_playground.init_pso_algorithm_args()
+                self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args()
+            elif self.selected_algorithm == "PSO+GA":
+                self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args()
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
@@ -193,15 +193,15 @@ class Playground:
         best_fitness_values = []
 
         if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
-            best_path_points, best_fitness_values = pso_algorithm_playground.run_pso_algorithm(
+            best_path_points, best_fitness_values = pso_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
         elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
-            best_path_points, best_fitness_values = genetic_algorithm_playground.run_genetic_algorithm(
+            best_path_points, best_fitness_values = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
-        elif algorithm == "Dynamic PSO" and isinstance(args, DynamicPSOAlgorithmArguments):
-            best_path_points, best_fitness_values = dynamic_pso_algorithm_playground.run_pso_algorithm(
+        elif algorithm == "PSO+GA" and isinstance(args, DynamicPSOAlgorithmArguments):
+            best_path_points, best_fitness_values = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function
             )
 

@@ -7,7 +7,7 @@ from pp3d.algorithm.genetic.genetic import GeneticAlgorithm
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 
 
-def init_genetic_algorithm_args() -> GeneticAlgorithmArguments:
+def init_algorithm_args() -> GeneticAlgorithmArguments:
     """Initialize genetic algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
@@ -46,7 +46,7 @@ def init_genetic_algorithm_args() -> GeneticAlgorithmArguments:
         )
 
 
-def run_genetic_algorithm(
+def run_algorithm(
     args: GeneticAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
 ) -> tuple[np.ndarray, list[float]]:
     """Run the genetic algorithm for the 3D Path Planning Playground.

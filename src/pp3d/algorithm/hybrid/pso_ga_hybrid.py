@@ -180,6 +180,147 @@ class DynamicPSOAlgorithm:
                 self.global_best_fitness_value = fitness_values[i]
                 self.global_best_position = particle.position.copy()
 
+    def _use_genetic_algorithm_to_optimize_pso(self, current_iteration: int) -> None:
+        """Use genetic algorithm to collaboratively optimize PSO algorithm.
+
+        Args:
+            current_iteration (int): The current iteration of the algorithm.
+        """
+        logger.info("Use genetic algorithm to optimize PSO algorithm")
+
+        fitness_values = np.array([p.best_fitness_value for p in self.particles])
+        sorted_indices_by_fitness = (
+            np.argsort(fitness_values)
+            if self.problem_type == ProblemType.MINIMIZATION
+            else np.argsort(fitness_values)[::-1]
+        )
+
+        # Select the top 50% particles to be used in the genetic algorithm
+        top_particles = [self.particles[i] for i in sorted_indices_by_fitness[: len(sorted_indices_by_fitness) // 2]]
+
+        # Use genetic algorithm to mutate the top 50% particles
+        mutated_particles: list[Particle] = []
+        for i in range(0, len(top_particles) - 1, 2):
+            parent1, parent2 = top_particles[i], top_particles[i + 1]
+            child1, child2 = self._crossover(parent1, parent2, current_iteration)
+            mutated_child1 = self._mutate(child1, current_iteration)
+            mutated_child2 = self._mutate(child2, current_iteration)
+            mutated_particles.append(mutated_child1)
+            mutated_particles.append(mutated_child2)
+
+        # Replace the bottom 50% particles with the mutated particles
+        worst_indices = sorted_indices_by_fitness[-len(mutated_particles) :]
+        for i, particle in zip(worst_indices, mutated_particles):
+            self.particles[i].position = particle.position.copy()
+            self.particles[i].best_position = particle.position.copy()
+
+    def _crossover(self, parent1: Particle, parent2: Particle, current_iteration: int) -> tuple[Particle, Particle]:
+        """Crossover the parents to generate children.
+
+        Args:
+            parent1 (Particle): The first parent.
+            parent2 (Particle): The second parent.
+            current_iteration (int): The current iteration of the genetic algorithm.
+
+        Returns:
+            tuple[Particle, Particle]: The parents with new position.
+        """
+        logger.debug("Use genetic algorithm to crossover particles")
+
+        # Dynamic crossover rate
+        sin_coefficient = 0.5
+        golden_ratio = (1 + np.sqrt(5)) / 2
+        crossover_rate_decay = 0.01
+        static_crossover_rate = 0.8
+        dynamic_crossover_rate = (
+            sin_coefficient
+            * (1 + np.sin(2 * np.pi * static_crossover_rate / (1 + golden_ratio)))
+            * np.exp(-crossover_rate_decay * current_iteration)
+        )
+
+        # Dynamic crossover parameter
+        particle_distribution_coefficient_eta = 2 * (1 + 0.2 * np.cos(2 * np.pi * current_iteration / 15))
+        power = 1 / (particle_distribution_coefficient_eta + 1)
+        random_num = np.random.rand()
+        if random_num <= 0.5:
+            crossover_parameter_beta = np.power(2 * random_num, power)
+        else:
+            crossover_parameter_beta = np.power(1 / (2 - 2 * random_num), power)
+
+        # Simulated binary crossover
+        child1_position = dynamic_crossover_rate * parent1.position + (1 - dynamic_crossover_rate) * parent2.position
+        child2_position = dynamic_crossover_rate * parent2.position + (1 - dynamic_crossover_rate) * parent1.position
+
+        # Add standard t-distribution perturbation to children
+        standard_t_value = np.random.standard_t(df=3, size=parent1.position.shape)
+        child1_position = (
+            0.5 * ((1 + crossover_parameter_beta) * child1_position + (1 - crossover_parameter_beta) * child2_position)
+            + 2 * standard_t_value
+        )
+        child2_position = (
+            0.5 * ((1 + crossover_parameter_beta) * child2_position + (1 - crossover_parameter_beta) * child1_position)
+            + 2 * standard_t_value
+        )
+
+        # Clip children to ensure they are within the search space
+        child1_position = np.clip(child1_position.reshape(self.shape), self.axes_min, self.axes_max).flatten()
+        child2_position = np.clip(child2_position.reshape(self.shape), self.axes_min, self.axes_max).flatten()
+
+        parent1.position = child1_position.copy()
+        parent1.best_position = child1_position.copy()
+        parent2.position = child2_position.copy()
+        parent2.best_position = child2_position.copy()
+
+        return parent1, parent2
+
+    def _mutate(self, particle: Particle, current_iteration: int) -> Particle:
+        """Mutate the particle.
+
+        Args:
+            particle (Particle): The particle to mutate.
+            current_iteration (int): The current iteration of the algorithm.
+
+        Returns:
+            Particle: The mutated particle.
+        """
+        logger.debug("Use genetic algorithm to mutate particle")
+
+        # Dynamic mutation rate
+        sin_coefficient = 0.5
+        golden_ratio = (1 + np.sqrt(5)) / 2
+        mutation_rate_decay = 0.01
+        static_mutation_rate = 0.2
+        dynamic_mutation_rate = (
+            sin_coefficient
+            * (1 + np.sin(2 * np.pi * static_mutation_rate / (1 + golden_ratio)))
+            * np.exp(-mutation_rate_decay * current_iteration)
+        )
+
+        # Calculate levy flight step size
+        gaussian_distribution_random_num_u = np.random.normal(loc=0, scale=1, size=particle.position.shape)
+        gaussian_distribution_random_num_v = np.random.normal(loc=0, scale=1, size=particle.position.shape)
+        random_num1 = np.random.rand()
+        random_num2 = np.random.rand()
+        levy_flight_alpha = max(0.6 - 0.1 * current_iteration / self.args.max_iterations, 0.5)
+        levy_flight_beta = max(1.5 - 0.1 * current_iteration / self.args.max_iterations, 1)
+        levy_flight_step_size = (
+            gaussian_distribution_random_num_u
+            / np.power(np.abs(gaussian_distribution_random_num_v), 1 / levy_flight_beta)
+            * levy_flight_alpha
+            * random_num1
+            * np.power(np.abs(random_num2), 1 / levy_flight_beta)
+        )
+
+        mutated_position = particle.position + dynamic_mutation_rate * levy_flight_step_size
+
+        # Clip mutated position to ensure it is within the search space
+        mutated_position = np.clip(mutated_position.reshape(self.shape), self.axes_min, self.axes_max).flatten()
+
+        particle.position = mutated_position.copy()
+        particle.best_position = mutated_position.copy()
+
+        return particle
+
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the Dynamic PSO algorithm.
 
@@ -201,6 +342,9 @@ class DynamicPSOAlgorithm:
                 f"Iteration {iteration + 1}/{self.args.max_iterations}, "
                 f"best fitness value = {self.global_best_fitness_value:.6f}"
             )
+
+            if iteration > 0 and iteration % (self.args.max_iterations * 0.05) == 0:
+                self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
 
         logger.success(f"Dynamic PSO algorithm finished, best fitness value = {self.global_best_fitness_value:.6f}")
 

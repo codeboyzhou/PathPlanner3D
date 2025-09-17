@@ -7,7 +7,7 @@ from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 
 
-def init_pso_algorithm_args() -> PSOAlgorithmArguments:
+def init_algorithm_args() -> PSOAlgorithmArguments:
     """Initialize PSO algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
@@ -53,7 +53,7 @@ def init_pso_algorithm_args() -> PSOAlgorithmArguments:
         )
 
 
-def run_pso_algorithm(
+def run_algorithm(
     args: PSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
 ) -> tuple[np.ndarray, list[float]]:
     """Run the PSO algorithm for the 3D Path Planning Playground.

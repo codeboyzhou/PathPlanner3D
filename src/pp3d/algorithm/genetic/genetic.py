@@ -79,7 +79,7 @@ class GeneticAlgorithm:
         fitness_values = np.array([self.fitness_function(individual.gene) for individual in self.population])
         return fitness_values
 
-    def _selection(self, fitness_values: np.ndarray) -> list[Individual]:
+    def _select(self, fitness_values: np.ndarray) -> list[Individual]:
         """Select the parents for the next generation.
 
         Args:
@@ -117,7 +117,7 @@ class GeneticAlgorithm:
         else:
             return parent1, parent2
 
-    def _mutation(self, individual: Individual, current_iteration: int) -> Individual:
+    def _mutate(self, individual: Individual, current_iteration: int) -> Individual:
         """Mutate the individual.
 
         Args:
@@ -171,15 +171,15 @@ class GeneticAlgorithm:
                 f"best fitness value = {self.best_individual.fitness_value:.6f}"
             )
 
-            parents = self._selection(fitness_values)
+            parents = self._select(fitness_values)
 
             next_population: list[Individual] = [self.best_individual]  # Elitism: preserve the best individual directly
 
             for i in range(0, self.args.population_size - 1, 2):
                 parent1, parent2 = parents[i], parents[i + 1]
                 child1, child2 = self._crossover(parent1, parent2)
-                child1 = self._mutation(child1, iteration)
-                child2 = self._mutation(child2, iteration)
+                child1 = self._mutate(child1, iteration)
+                child2 = self._mutate(child2, iteration)
                 next_population.append(child1)
                 next_population.append(child2)
 
