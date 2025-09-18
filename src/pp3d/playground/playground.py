@@ -16,13 +16,16 @@ from pp3d.playground import (
     pso_ga_hybrid_playground,
 )
 from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
+from pp3d.playground.types import AlgorithmIterationResult
 from pp3d.visualization import plotly_utils
 
 
 def _init_streamlit_session_state():
     """Initialize the session state of streamlit."""
-    if "run_algorithm" not in st.session_state:
-        st.session_state.run_algorithm = False
+    if "run_selected_algorithm" not in st.session_state:
+        st.session_state.run_selected_algorithm = False
+    if "run_multiple_algorithms" not in st.session_state:
+        st.session_state.run_multiple_algorithms = False
 
 
 def _st_monaco_editor(value: str, language: str = "python", height: str = "480px", theme: str = "vs-dark") -> str:
@@ -64,12 +67,12 @@ class Playground:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
             st.header("⚙️ Algorithm Settings")
-            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO+GA"])
+            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO-GA Hybrid"])
             if self.selected_algorithm == "PSO":
                 self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args()
             elif self.selected_algorithm == "GA":
                 self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args()
-            elif self.selected_algorithm == "PSO+GA":
+            elif self.selected_algorithm == "PSO-GA Hybrid":
                 self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args()
 
     def _init_middle_column(self) -> None:
@@ -83,16 +86,22 @@ class Playground:
             with st.expander(label="Fitness Function", expanded=False):
                 self.input_fitness_function_code = _st_monaco_editor(value=FITNESS_FUNCTION_CODE_TEMPLATE)
 
-            button_run_algorithm_clicked = st.button(label="Run Algorithm")
-            if button_run_algorithm_clicked:
-                st.session_state.run_algorithm = True
+            button_run_selected_algorithm_clicked = st.button(label="Run Selected Algorithm")
+            if button_run_selected_algorithm_clicked:
+                st.session_state.run_selected_algorithm = True
+
+            button_run_multiple_algorithms_clicked = st.button(label="Run Multiple Algorithms")
+            if button_run_multiple_algorithms_clicked:
+                st.session_state.run_multiple_algorithms = True
 
     def _init_right_column(self) -> None:
         """Initialize the right column of the 3D Path Planning Playground."""
         with self.right:
             st.header("📊 Result Visualization")
-            if st.session_state.run_algorithm:
-                self._run_algorithm()
+            if st.session_state.run_selected_algorithm:
+                self._run_selected_algorithm()
+            if st.session_state.run_multiple_algorithms:
+                self._run_multiple_algorithms()
 
     def _parse_fitness_function(
         self, start_point: np.ndarray, destination: np.ndarray, xx: np.ndarray, yy: np.ndarray, zz: np.ndarray
@@ -140,8 +149,14 @@ class Playground:
         except Exception as e:
             st.error(f"Error parsing terrain generation code: {e}")
 
-    def _generate_terrain(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _generate_terrain(
+        self, axes_min: tuple[float, float, float], axes_max: tuple[float, float, float]
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Generate the terrain using the input terrain generation function code.
+
+        Args:
+            axes_min (tuple[float, float, float]): The minimum values of the axes.
+            axes_max (tuple[float, float, float]): The maximum values of the axes.
 
         Returns:
             xx (np.ndarray): The x-axis values of the terrain.
@@ -154,12 +169,6 @@ class Playground:
             st.error("Error running algorithm: callable_terrain_generation_function is None.")
             return np.array([]), np.array([]), np.array([])
 
-        if self.selected_algorithm_args is None:
-            st.error("Error running algorithm: self.selected_algorithm_args is None.")
-            return np.array([]), np.array([]), np.array([])
-
-        axes_min = self.selected_algorithm_args.axes_min
-        axes_max = self.selected_algorithm_args.axes_max
         x = np.linspace(start=axes_min[0], stop=axes_max[0], num=100)
         y = np.linspace(start=axes_min[1], stop=axes_max[1], num=100)
         xx, yy = np.meshgrid(x, y)
@@ -168,9 +177,9 @@ class Playground:
 
         return xx, yy, zz
 
-    def _run_algorithm(self) -> None:
+    def _run_selected_algorithm(self) -> None:
         """Run the selected algorithm."""
-        st.session_state.run_algorithm = False
+        st.session_state.run_selected_algorithm = False
 
         if self.selected_algorithm_args is None:
             st.error("Error running algorithm: self.selected_algorithm_args is None.")
@@ -179,7 +188,9 @@ class Playground:
         start_point = np.array([0, 0, 5])
         destination = np.array([90, 90, 5])
 
-        xx, yy, zz = self._generate_terrain()
+        axes_min = self.selected_algorithm_args.axes_min
+        axes_max = self.selected_algorithm_args.axes_max
+        xx, yy, zz = self._generate_terrain(axes_min, axes_max)
 
         callable_fitness_function = self._parse_fitness_function(start_point, destination, xx, yy, zz)
 
@@ -200,7 +211,7 @@ class Playground:
             best_path_points, best_fitness_values = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
-        elif algorithm == "PSO+GA" and isinstance(args, DynamicPSOAlgorithmArguments):
+        elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
             best_path_points, best_fitness_values = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function
             )
@@ -209,6 +220,94 @@ class Playground:
 
         plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
         plotly_utils.plot_fitness_curve(best_fitness_values)
+
+    def _run_multiple_algorithms(self) -> None:
+        """Run multiple algorithms."""
+        st.session_state.run_multiple_algorithms = False
+
+        start_point = np.array([0, 0, 5])
+        destination = np.array([90, 90, 5])
+
+        num_particles = 50
+        num_waypoints = 4
+        max_iterations = 300
+        axes_min = (0, 0, 5)
+        axes_max = (100, 100, 100)
+        max_velocities = (1.0, 1.0, 1.0)
+
+        pso_algorithm_args = PSOAlgorithmArguments(
+            num_particles=num_particles,
+            num_waypoints=num_waypoints,
+            max_iterations=max_iterations,
+            inertia_weight_min=0.4,
+            inertia_weight_max=0.9,
+            cognitive_weight=1.5,
+            social_weight=1.5,
+            max_velocities=max_velocities,
+            axes_min=axes_min,
+            axes_max=axes_max,
+            random_seed=None,
+            verbose=False,
+        )
+        ga_algorithm_args = GeneticAlgorithmArguments(
+            population_size=num_particles,
+            tournament_size=3,
+            num_waypoints=num_waypoints,
+            max_iterations=max_iterations,
+            crossover_rate=0.8,
+            mutation_rate=0.2,
+            axes_min=axes_min,
+            axes_max=axes_max,
+            random_seed=None,
+            verbose=False,
+        )
+        pso_ga_hybrid_algorithm_args = DynamicPSOAlgorithmArguments(
+            num_particles=num_particles,
+            num_waypoints=num_waypoints,
+            max_iterations=max_iterations,
+            inertia_weight_min=0.4,
+            inertia_weight_max=0.9,
+            cognitive_weight_min=0.5,
+            cognitive_weight_max=2.5,
+            social_weight_min=0.5,
+            social_weight_max=2.5,
+            max_velocities=max_velocities,
+            axes_min=axes_min,
+            axes_max=axes_max,
+            random_seed=None,
+            verbose=False,
+        )
+
+        # All algorithms use the same terrain, so we only need to generate the terrain once.
+        xx, yy, zz = self._generate_terrain(pso_algorithm_args.axes_min, pso_algorithm_args.axes_max)
+
+        callable_fitness_function = self._parse_fitness_function(start_point, destination, xx, yy, zz)
+
+        if callable_fitness_function is None:
+            st.error("Error running algorithm: callable_fitness_function is None.")
+            return
+
+        pso_path_points, pso_fitness_values = pso_algorithm_playground.run_algorithm(
+            pso_algorithm_args, callable_fitness_function
+        )
+        ga_path_points, ga_fitness_values = genetic_algorithm_playground.run_algorithm(
+            ga_algorithm_args, callable_fitness_function
+        )
+        pso_ga_hybrid_path_points, pso_ga_hybrid_fitness_values = pso_ga_hybrid_playground.run_algorithm(
+            pso_ga_hybrid_algorithm_args, callable_fitness_function
+        )
+
+        algorithm_iteration_result = AlgorithmIterationResult(
+            pso_full_path_points=np.vstack([start_point, pso_path_points, destination]),
+            ga_full_path_points=np.vstack([start_point, ga_path_points, destination]),
+            pso_ga_hybrid_full_path_points=np.vstack([start_point, pso_ga_hybrid_path_points, destination]),
+            pso_best_fitness_values=pso_fitness_values,
+            ga_best_fitness_values=ga_fitness_values,
+            pso_ga_hybrid_best_fitness_values=pso_ga_hybrid_fitness_values,
+        )
+
+        plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, algorithm_iteration_result)
+        plotly_utils.plot_multiple_fitness_curves(algorithm_iteration_result)
 
 
 if __name__ == "__main__":
