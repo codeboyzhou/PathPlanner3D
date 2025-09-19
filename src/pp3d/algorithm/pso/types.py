@@ -10,11 +10,8 @@ class PSOAlgorithmArguments(AlgorithmArguments):
     num_particles: int
     """The number of particles in the swarm."""
 
-    inertia_weight_min: float
-    """The minimum inertia weight."""
-
-    inertia_weight_max: float
-    """The maximum inertia weight."""
+    inertia_weight: float
+    """The inertia weight."""
 
     cognitive_weight: float
     """The cognitive weight."""

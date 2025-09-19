@@ -78,38 +78,24 @@ class PSOAlgorithm:
         logger.debug(f"Evaluated global best position: {self.global_best_position}")
         logger.debug(f"Evaluated global best fitness value: {self.global_best_fitness_value}")
 
-    def _get_inertia_weight(self, current_iteration: int) -> float:
+    def _get_inertia_weight(self) -> float:
         """Get the inertia weight for the current iteration.
-
-        Args:
-            current_iteration (int): The current iteration of the algorithm.
 
         Returns:
             float: The inertia weight for the current iteration.
         """
-        # Use linearly decreasing inertia weight
-        inertia_weight_diff = self.args.inertia_weight_max - self.args.inertia_weight_min
-        iteration_progress = current_iteration / self.args.max_iterations
-        inertia_weight = self.args.inertia_weight_max - inertia_weight_diff * iteration_progress
-        logger.debug(f"Iteration {current_iteration}/{self.args.max_iterations}, inertia_weight = {inertia_weight}")
-        return inertia_weight
+        return self.args.inertia_weight
 
-    def _get_cognitive_weight(self, current_iteration: int) -> float:
+    def _get_cognitive_weight(self) -> float:
         """Get the cognitive weight for the current iteration.
-
-        Args:
-            current_iteration (int): The current iteration of the algorithm.
 
         Returns:
             float: The cognitive weight for the current iteration.
         """
         return self.args.cognitive_weight
 
-    def _get_social_weight(self, current_iteration: int) -> float:
+    def _get_social_weight(self) -> float:
         """Get the social weight for the current iteration.
-
-        Args:
-            current_iteration (int): The current iteration of the algorithm.
 
         Returns:
             float: The social weight for the current iteration.
@@ -124,9 +110,9 @@ class PSOAlgorithm:
         """
         logger.debug(f"Updating particle velocities and positions for iteration {current_iteration}...")
 
-        inertia_weight = self._get_inertia_weight(current_iteration)
-        cognitive_weight = self._get_cognitive_weight(current_iteration)
-        social_weight = self._get_social_weight(current_iteration)
+        inertia_weight = self._get_inertia_weight()
+        cognitive_weight = self._get_cognitive_weight()
+        social_weight = self._get_social_weight()
 
         for particle in self.particles:
             r1 = np.random.rand(self.shape[0], self.shape[1]).flatten()
