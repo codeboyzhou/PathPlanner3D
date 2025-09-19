@@ -343,8 +343,7 @@ class DynamicPSOAlgorithm:
                 f"best fitness value = {self.global_best_fitness_value:.6f}"
             )
 
-            if iteration > 0 and iteration % (self.args.max_iterations * 0.05) == 0:
-                self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
+            self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
 
         logger.success(f"Dynamic PSO algorithm finished, best fitness value = {self.global_best_fitness_value:.6f}")
 
