@@ -1,8 +1,6 @@
 # The code template for terrain generation function
 TERRAIN_GENERATION_CODE_TEMPLATE = """
 def generate_terrain(xx: np.ndarray, yy: np.ndarray) -> np.ndarray:
-    zz = np.zeros_like(xx)
-    
     peaks=[
         # (center_x, center_y, amplitude, radius)
         (20, 20, 5, 8),
@@ -10,6 +8,8 @@ def generate_terrain(xx: np.ndarray, yy: np.ndarray) -> np.ndarray:
         (60, 20, 5, 8),
         (60, 70, 5, 8)
     ]
+    
+    zz = np.zeros_like(xx)
     
     for peak in peaks:
         center_x, center_y, amplitude, radius = peak
@@ -31,8 +31,23 @@ def fitness_function(path_points: np.ndarray) -> float:
     full_path_points = np.vstack([start_point, reshaped_path_points, destination])
     full_path_points = interpolates.smooth_path_with_cubic_spline(full_path_points)
     
-    # Calculate the collision cost
-    collision_cost = np.sum([1e4 if collision_detection.check(xx, yy, zz, point) else 0 for point in full_path_points])
+    peaks=[
+        # (center_x, center_y, amplitude, radius)
+        (20, 20, 5, 8),
+        (20, 70, 5, 8),
+        (60, 20, 5, 8),
+        (60, 70, 5, 8)
+    ]
+    
+    # Check for vertical collision cost
+    vertical_collision_cost = np.sum(
+        [1e4 if collision_detection.check_vertical_collision(xx, yy, zz, point) else 0 for point in full_path_points]
+    )
+    
+    # Check for horizontal collision cost
+    horizontal_collision_cost = np.sum(
+        [1e4 if collision_detection.check_horizontal_collision(point, peaks) else 0 for point in full_path_points]
+    )
     
     # Calculate the path length cost
     path_diff = np.diff(full_path_points, axis=0)
@@ -41,5 +56,5 @@ def fitness_function(path_points: np.ndarray) -> float:
     # Calculate the average height cost
     average_height = np.mean(full_path_points[:, 2])
     
-    return collision_cost + path_length + average_height
+    return vertical_collision_cost + horizontal_collision_cost + path_length + average_height
 """.strip()
