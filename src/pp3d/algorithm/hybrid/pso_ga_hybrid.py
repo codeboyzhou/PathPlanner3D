@@ -7,6 +7,7 @@ from loguru import logger
 from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import Particle
 from pp3d.common import algorithm_utils
+from pp3d.common.decorators import timer
 from pp3d.common.types import ProblemType
 
 
@@ -321,6 +322,7 @@ class DynamicPSOAlgorithm:
 
         return particle
 
+    @timer
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the Dynamic PSO algorithm.
 

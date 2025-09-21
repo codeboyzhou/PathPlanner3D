@@ -50,8 +50,9 @@ def check_horizontal_collision(
     """
     point_x, point_y, point_z = point
     for peak in peaks:
-        center_x, center_y, _, radius = peak
-        distance = np.sqrt((point_x - center_x) ** 2 + (point_y - center_y) ** 2)
-        if distance < radius + safe_distance:
+        center_x, center_y, amplitude, radius = peak
+        peak_section_radius = radius * np.sqrt(2 * np.log(10 * amplitude / point_z))
+        distance_to_peak_center = np.sqrt((point_x - center_x) ** 2 + (point_y - center_y) ** 2)
+        if distance_to_peak_center < peak_section_radius + safe_distance:
             return True
     return False

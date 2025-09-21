@@ -6,6 +6,7 @@ from loguru import logger
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments, Individual
 from pp3d.common import algorithm_utils
+from pp3d.common.decorators import timer
 from pp3d.common.types import ProblemType
 
 
@@ -151,6 +152,7 @@ class GeneticAlgorithm:
         if algorithm_utils.compare_fitness(best_fitness_value, self.best_individual.fitness_value, self.problem_type):
             self.best_individual = best_individual
 
+    @timer
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the genetic algorithm.
 

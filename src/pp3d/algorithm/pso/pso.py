@@ -6,6 +6,7 @@ from loguru import logger
 
 from pp3d.algorithm.pso.types import Particle, PSOAlgorithmArguments
 from pp3d.common import algorithm_utils
+from pp3d.common.decorators import timer
 from pp3d.common.types import ProblemType
 
 
@@ -155,6 +156,7 @@ class PSOAlgorithm:
                 self.global_best_fitness_value = fitness_values[i]
                 self.global_best_position = particle.position.copy()
 
+    @timer
     def run(self) -> tuple[np.ndarray, list[float]]:
         """Run the PSO algorithm.
 
