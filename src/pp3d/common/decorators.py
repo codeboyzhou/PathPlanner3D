@@ -24,7 +24,7 @@ def timer(func: Callable):
         finally:
             end_time = time.perf_counter()
             duration = end_time - start_time
-            logger.success(f"Function {__file__}.{func.__name__} took {duration:.3f} seconds to execute")
+            logger.success(f"Function {func.__module__}.{func.__name__}() took {duration:.3f} seconds to execute")
         return result
 
     return wrapper

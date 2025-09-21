@@ -49,6 +49,8 @@ def fitness_function(path_points: np.ndarray) -> float:
         [1e4 if collision_detection.check_horizontal_collision(point, peaks) else 0 for point in full_path_points]
     )
     
+    collision_cost = vertical_collision_cost + horizontal_collision_cost
+    
     # Calculate the path length cost
     path_diff = np.diff(full_path_points, axis=0)
     path_length = np.sum(np.sqrt(np.sum(path_diff**2, axis=1)))
@@ -56,5 +58,5 @@ def fitness_function(path_points: np.ndarray) -> float:
     # Calculate the average height cost
     average_height = np.mean(full_path_points[:, 2])
     
-    return vertical_collision_cost + horizontal_collision_cost + path_length + average_height
+    return collision_cost + path_length + average_height
 """.strip()

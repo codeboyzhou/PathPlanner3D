@@ -51,8 +51,24 @@ def check_horizontal_collision(
     point_x, point_y, point_z = point
     for peak in peaks:
         center_x, center_y, amplitude, radius = peak
-        peak_section_radius = radius * np.sqrt(2 * np.log(10 * amplitude / point_z))
+
+        # Validate inputs to prevent invalid values in log() and sqrt() functions
+        if point_z <= 0 or amplitude <= 0 or radius <= 0:
+            continue
+
+        log_expression = 10 * amplitude / point_z
+        if log_expression <= 0:
+            continue
+
+        # Additional check to ensure log(log_expression) is non-negative
+        # This prevents invalid values in sqrt when log_expression < 1
+        log_value = np.log(log_expression)
+        if log_value < 0:
+            continue
+
+        peak_section_radius = radius * np.sqrt(2 * log_value)
         distance_to_peak_center = np.sqrt((point_x - center_x) ** 2 + (point_y - center_y) ** 2)
         if distance_to_peak_center < peak_section_radius + safe_distance:
             return True
+
     return False
