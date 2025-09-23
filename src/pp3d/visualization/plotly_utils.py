@@ -2,7 +2,7 @@ import numpy as np
 import streamlit as st
 from plotly import graph_objects
 
-from pp3d.common import interpolates
+from pp3d.common import interpolate
 from pp3d.playground.types import AlgorithmIterationResult
 
 
@@ -66,7 +66,7 @@ def plot_terrain_and_path(
         name="Destination",
     )
 
-    smooth_path_points = interpolates.smooth_path_with_cubic_spline(path_points)
+    smooth_path_points = interpolate.smooth_path_with_cubic_spline(path_points)
     smooth_x, smooth_y, smooth_z = smooth_path_points[:, 0], smooth_path_points[:, 1], smooth_path_points[:, 2]
     path = graph_objects.Scatter3d(
         x=smooth_x, y=smooth_y, z=smooth_z, mode="lines", line={"width": 6, "color": "springgreen"}, name="Target Path"
@@ -131,7 +131,7 @@ def plot_terrain_and_multipath(
     fig.add_trace(destination_scatter)
 
     pso_path_points = algorithm_iteration_result.pso_full_path_points
-    pso_smooth_path_points = interpolates.smooth_path_with_cubic_spline(pso_path_points)
+    pso_smooth_path_points = interpolate.smooth_path_with_cubic_spline(pso_path_points)
     pso_smooth_x, pso_smooth_y, pso_smooth_z = (
         pso_smooth_path_points[:, 0],
         pso_smooth_path_points[:, 1],
@@ -148,7 +148,7 @@ def plot_terrain_and_multipath(
     fig.add_trace(pso_path)
 
     ga_path_points = algorithm_iteration_result.ga_full_path_points
-    ga_smooth_path_points = interpolates.smooth_path_with_cubic_spline(ga_path_points)
+    ga_smooth_path_points = interpolate.smooth_path_with_cubic_spline(ga_path_points)
     ga_smooth_x, ga_smooth_y, ga_smooth_z = (
         ga_smooth_path_points[:, 0],
         ga_smooth_path_points[:, 1],
@@ -165,7 +165,7 @@ def plot_terrain_and_multipath(
     fig.add_trace(ga_path)
 
     pso_ga_hybrid_path_points = algorithm_iteration_result.pso_ga_hybrid_full_path_points
-    pso_ga_hybrid_smooth_path_points = interpolates.smooth_path_with_cubic_spline(pso_ga_hybrid_path_points)
+    pso_ga_hybrid_smooth_path_points = interpolate.smooth_path_with_cubic_spline(pso_ga_hybrid_path_points)
     pso_ga_hybrid_smooth_x, pso_ga_hybrid_smooth_y, pso_ga_hybrid_smooth_z = (
         pso_ga_hybrid_smooth_path_points[:, 0],
         pso_ga_hybrid_smooth_path_points[:, 1],

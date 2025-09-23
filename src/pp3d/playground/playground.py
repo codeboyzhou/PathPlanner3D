@@ -2,20 +2,19 @@ from collections.abc import Callable
 
 import numpy as np
 import streamlit as st
-from loguru import logger
 from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
-from pp3d.common import collision_detection, interpolates
+from pp3d.common import collision_detection, flight_angle_calculator, interpolate
 from pp3d.playground import (
     genetic_algorithm_playground,
     pso_algorithm_playground,
     pso_ga_hybrid_playground,
 )
-from pp3d.playground.constants import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
+from pp3d.playground.code_template import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
 from pp3d.playground.types import AlgorithmIterationResult
 from pp3d.visualization import plotly_utils
 
@@ -124,11 +123,11 @@ class Playground:
                 "xx": xx,
                 "yy": yy,
                 "zz": zz,
-                "logger": logger,
-                "interpolates": interpolates,
+                "interpolate": interpolate,
                 "start_point": start_point,
                 "destination": destination,
                 "collision_detection": collision_detection,
+                "flight_angle_calculator": flight_angle_calculator,
             }
             parsed_fitness_function = {}
             exec(self.input_fitness_function_code, allowed_packages, parsed_fitness_function)
@@ -231,7 +230,7 @@ class Playground:
         num_particles = 50
         num_waypoints = 4
         max_iterations = 300
-        axes_min = (0, 0, 5)
+        axes_min = (0, 0, 0)
         axes_max = (100, 100, 100)
         max_velocities = (1.0, 1.0, 1.0)
 
@@ -239,7 +238,7 @@ class Playground:
             num_particles=num_particles,
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
-            inertia_weight=0.5,
+            inertia_weight=0.4,
             cognitive_weight=1.5,
             social_weight=1.5,
             max_velocities=max_velocities,
