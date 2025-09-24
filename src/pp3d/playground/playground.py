@@ -307,6 +307,9 @@ class Playground:
 
         st.error(
             f"PSO best fitness value = {pso_fitness_values[-1]:.2f}, "
+            f"num_particles = {pso_algorithm_args.num_particles}, "
+            f"num_waypoints = {pso_algorithm_args.num_waypoints}, "
+            f"max_iterations = {pso_algorithm_args.max_iterations}, "
             f"inertia_weight = {pso_algorithm_args.inertia_weight:.2f}, "
             f"cognitive_weight = {pso_algorithm_args.cognitive_weight:.2f}, "
             f"social_weight = {pso_algorithm_args.social_weight:.2f}, "
@@ -315,6 +318,10 @@ class Playground:
 
         st.success(
             f"GA best fitness value = {ga_fitness_values[-1]:.2f}, "
+            f"population_size = {ga_algorithm_args.population_size}, "
+            f"tournament_size = {ga_algorithm_args.tournament_size}, "
+            f"num_waypoints = {ga_algorithm_args.num_waypoints}, "
+            f"max_iterations = {ga_algorithm_args.max_iterations}, "
             f"crossover_rate = {ga_algorithm_args.crossover_rate:.2f}, "
             f"mutation_rate = {ga_algorithm_args.mutation_rate:.2f}, "
             f"time cost = {ga_duration:.2f}s"
@@ -322,6 +329,9 @@ class Playground:
 
         st.warning(
             f"PSO-GA Hybrid best fitness value = {pso_ga_hybrid_fitness_values[-1]:.2f}, "
+            f"num_particles = {pso_ga_hybrid_algorithm_args.num_particles}, "
+            f"num_waypoints = {pso_ga_hybrid_algorithm_args.num_waypoints}, "
+            f"max_iterations = {pso_ga_hybrid_algorithm_args.max_iterations}, "
             f"inertia_weight_min = {pso_ga_hybrid_algorithm_args.inertia_weight_min:.2f}, "
             f"inertia_weight_max = {pso_ga_hybrid_algorithm_args.inertia_weight_max:.2f}, "
             f"cognitive_weight_min = {pso_ga_hybrid_algorithm_args.cognitive_weight_min:.2f}, "
