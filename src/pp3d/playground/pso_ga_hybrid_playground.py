@@ -1,3 +1,4 @@
+import time
 from collections.abc import Callable
 
 import numpy as np
@@ -63,7 +64,7 @@ def init_algorithm_args() -> DynamicPSOAlgorithmArguments:
 
 def run_algorithm(
     args: DynamicPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
-) -> tuple[np.ndarray, list[float]]:
+) -> tuple[np.ndarray, list[float], float]:
     """Run the Dynamic PSO algorithm for the 3D Path Planning Playground.
 
     Args:
@@ -71,8 +72,11 @@ def run_algorithm(
         fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
 
     Returns:
-        tuple[np.ndarray, list[float]]: The best path points and best fitness values.
+        tuple[np.ndarray, list[float], float]: The best path points, best fitness values, and the time cost.
     """
+    start_time = time.perf_counter()
     dynamic_pso = DynamicPSOAlgorithm(args, fitness_function)
     best_path_points, best_fitness_values = dynamic_pso.run()
-    return best_path_points, best_fitness_values
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    return best_path_points, best_fitness_values, duration

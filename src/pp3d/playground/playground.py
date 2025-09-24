@@ -201,17 +201,18 @@ class Playground:
         args = self.selected_algorithm_args
         best_path_points = np.array([])
         best_fitness_values = []
+        duration = 0.0
 
         if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
-            best_path_points, best_fitness_values = pso_algorithm_playground.run_algorithm(
+            best_path_points, best_fitness_values, duration = pso_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
         elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
-            best_path_points, best_fitness_values = genetic_algorithm_playground.run_algorithm(
+            best_path_points, best_fitness_values, duration = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
         elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
-            best_path_points, best_fitness_values = pso_ga_hybrid_playground.run_algorithm(
+            best_path_points, best_fitness_values, duration = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function
             )
 
@@ -285,14 +286,14 @@ class Playground:
             st.error("Error running algorithm: callable_fitness_function is None.")
             return
 
-        pso_path_points, pso_fitness_values = pso_algorithm_playground.run_algorithm(
+        pso_path_points, pso_fitness_values, pso_duration = pso_algorithm_playground.run_algorithm(
             pso_algorithm_args, callable_fitness_function
         )
-        ga_path_points, ga_fitness_values = genetic_algorithm_playground.run_algorithm(
+        ga_path_points, ga_fitness_values, ga_duration = genetic_algorithm_playground.run_algorithm(
             ga_algorithm_args, callable_fitness_function
         )
-        pso_ga_hybrid_path_points, pso_ga_hybrid_fitness_values = pso_ga_hybrid_playground.run_algorithm(
-            pso_ga_hybrid_algorithm_args, callable_fitness_function
+        pso_ga_hybrid_path_points, pso_ga_hybrid_fitness_values, pso_ga_hybrid_duration = (
+            pso_ga_hybrid_playground.run_algorithm(pso_ga_hybrid_algorithm_args, callable_fitness_function)
         )
 
         algorithm_iteration_result = AlgorithmIterationResult(
@@ -302,6 +303,32 @@ class Playground:
             pso_best_fitness_values=pso_fitness_values,
             ga_best_fitness_values=ga_fitness_values,
             pso_ga_hybrid_best_fitness_values=pso_ga_hybrid_fitness_values,
+        )
+
+        st.error(
+            f"PSO best fitness value = {pso_fitness_values[-1]:.2f}, "
+            f"inertia_weight = {pso_algorithm_args.inertia_weight:.2f}, "
+            f"cognitive_weight = {pso_algorithm_args.cognitive_weight:.2f}, "
+            f"social_weight = {pso_algorithm_args.social_weight:.2f}, "
+            f"time cost = {pso_duration:.2f}s"
+        )
+
+        st.success(
+            f"GA best fitness value = {ga_fitness_values[-1]:.2f}, "
+            f"crossover_rate = {ga_algorithm_args.crossover_rate:.2f}, "
+            f"mutation_rate = {ga_algorithm_args.mutation_rate:.2f}, "
+            f"time cost = {ga_duration:.2f}s"
+        )
+
+        st.warning(
+            f"PSO-GA Hybrid best fitness value = {pso_ga_hybrid_fitness_values[-1]:.2f}, "
+            f"inertia_weight_min = {pso_ga_hybrid_algorithm_args.inertia_weight_min:.2f}, "
+            f"inertia_weight_max = {pso_ga_hybrid_algorithm_args.inertia_weight_max:.2f}, "
+            f"cognitive_weight_min = {pso_ga_hybrid_algorithm_args.cognitive_weight_min:.2f}, "
+            f"cognitive_weight_max = {pso_ga_hybrid_algorithm_args.cognitive_weight_max:.2f}, "
+            f"social_weight_min = {pso_ga_hybrid_algorithm_args.social_weight_min:.2f}, "
+            f"social_weight_max = {pso_ga_hybrid_algorithm_args.social_weight_max:.2f}, "
+            f"time cost = {pso_ga_hybrid_duration:.2f}s"
         )
 
         plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, algorithm_iteration_result)
