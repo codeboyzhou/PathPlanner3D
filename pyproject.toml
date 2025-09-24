@@ -10,7 +10,7 @@ dependencies = [
     "plotly>=6.3.0",
     "pydantic>=2.11.9",
     "scipy>=1.16.2",
-    "streamlit>=1.49.1",
+    "streamlit>=1.50.0",
     "streamlit-monaco-editor>=0.1.6",
 ]
 
@@ -21,7 +21,7 @@ dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "pytest-html>=4.1.1",
-    "ruff>=0.13.0",
+    "ruff>=0.13.1",
     "scipy-stubs>=1.16.2.0",
 ]
 
