@@ -4,33 +4,33 @@ from collections.abc import Callable
 import numpy as np
 from loguru import logger
 
-from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import Particle
 from pp3d.common import algorithm_utils
 from pp3d.common.decorators import timer
 from pp3d.common.types import ProblemType
 
 
-class DynamicPSOAlgorithm:
-    """Dynamic Particle Swarm Optimization (PSO) algorithm."""
+class HybridPSOAlgorithm:
+    """Hybrid Particle Swarm Optimization (PSO) algorithm."""
 
     def __init__(
         self,
-        args: DynamicPSOAlgorithmArguments,
+        args: HybridPSOAlgorithmArguments,
         fitness_function: Callable[[np.ndarray], float],
         problem_type: ProblemType = ProblemType.MINIMIZATION,
     ) -> None:
-        """Initialize the Dynamic PSO algorithm.
+        """Initialize the Hybrid PSO algorithm.
 
         Args:
-            args (DynamicPSOAlgorithmArguments): The arguments of the Dynamic PSO algorithm.
+            args (HybridPSOAlgorithmArguments): The arguments of the Hybrid PSO algorithm.
             fitness_function (Callable[[np.ndarray], float]): The fitness function.
             problem_type (ProblemType): The type of the problem. Defaults to ProblemType.MINIMIZATION.
         """
         logger.remove()
         logger.add(sink=sys.stdout, level="DEBUG" if args.verbose else "INFO")
 
-        logger.info("Initialize Dynamic PSO algorithm with arguments: {}", args.model_dump_json())
+        logger.info("Initialize Hybrid PSO algorithm with arguments: {}", args.model_dump_json())
 
         if args.random_seed is not None and args.random_seed > 0:
             np.random.seed(args.random_seed)
@@ -46,7 +46,7 @@ class DynamicPSOAlgorithm:
 
         self._init_particle_swarm()
 
-        logger.success("Dynamic PSO algorithm initialized successfully")
+        logger.success("Hybrid PSO algorithm initialized successfully")
 
     def _init_particle_swarm(self) -> None:
         """Initialize the particles swarm."""
@@ -324,12 +324,12 @@ class DynamicPSOAlgorithm:
 
     @timer
     def run(self) -> tuple[np.ndarray, list[float]]:
-        """Run the Dynamic PSO algorithm.
+        """Run the Hybrid PSO algorithm.
 
         Returns:
             tuple[np.ndarray, list[float]]: The best path points and fitness values.
         """
-        logger.info("Running Dynamic PSO algorithm...")
+        logger.info("Running Hybrid PSO algorithm...")
 
         # Collect the best fitness value of each iteration for fitness curve visualization
         best_fitness_values: list[float] = []
@@ -347,7 +347,7 @@ class DynamicPSOAlgorithm:
 
             self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
 
-        logger.success(f"Dynamic PSO algorithm finished, best fitness value = {self.global_best_fitness_value:.6f}")
+        logger.success(f"Hybrid PSO algorithm finished, best fitness value = {self.global_best_fitness_value:.6f}")
 
         # [x1, y1, z1, x2, y2, z2, ...] → [[x1, y1, z1], [x2, y2, z2], ...]
         best_path_points = self.global_best_position.reshape(-1, len(self.axes_min))

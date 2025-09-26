@@ -1,8 +1,8 @@
 from pp3d.algorithm.types import AlgorithmArguments
 
 
-class DynamicPSOAlgorithmArguments(AlgorithmArguments):
-    """Arguments for Dynamic Particle Swarm Optimization (PSO) algorithm."""
+class HybridPSOAlgorithmArguments(AlgorithmArguments):
+    """Arguments for Hybrid Particle Swarm Optimization (PSO) algorithm."""
 
     num_particles: int
     """The number of particles in the swarm."""

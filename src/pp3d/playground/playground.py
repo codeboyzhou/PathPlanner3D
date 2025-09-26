@@ -6,7 +6,7 @@ from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
-from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common import collision_detection, flight_angle_calculator, interpolate
 from pp3d.playground import (
@@ -54,7 +54,7 @@ class Playground:
 
         self.selected_algorithm: str = "PSO"
         self.selected_algorithm_args: (
-            PSOAlgorithmArguments | GeneticAlgorithmArguments | DynamicPSOAlgorithmArguments | None
+            PSOAlgorithmArguments | GeneticAlgorithmArguments | HybridPSOAlgorithmArguments | None
         ) = None
         self.input_terrain_generation_code: str = TERRAIN_GENERATION_CODE_TEMPLATE
         self.input_fitness_function_code: str = FITNESS_FUNCTION_CODE_TEMPLATE
@@ -218,7 +218,7 @@ class Playground:
             best_path_points, best_fitness_values, _ = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
-        elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
+        elif algorithm == "PSO-GA Hybrid" and isinstance(args, HybridPSOAlgorithmArguments):
             best_path_points, best_fitness_values, _ = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function
             )
@@ -269,7 +269,7 @@ class Playground:
             random_seed=None,
             verbose=False,
         )
-        pso_ga_hybrid_algorithm_args = DynamicPSOAlgorithmArguments(
+        pso_ga_hybrid_algorithm_args = HybridPSOAlgorithmArguments(
             num_particles=num_particles,
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
@@ -389,7 +389,7 @@ class Playground:
             best_fitness_list, duration_list = genetic_algorithm_playground.run_algorithm_multiple_times(
                 args, callable_fitness_function, run_times
             )
-        elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
+        elif algorithm == "PSO-GA Hybrid" and isinstance(args, HybridPSOAlgorithmArguments):
             best_fitness_list, duration_list = pso_ga_hybrid_playground.run_algorithm_multiple_times(
                 args, callable_fitness_function, run_times
             )

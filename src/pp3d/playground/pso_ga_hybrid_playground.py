@@ -5,17 +5,17 @@ import numpy as np
 import streamlit as st
 from loguru import logger
 
-from pp3d.algorithm.hybrid.pso_ga_hybrid import DynamicPSOAlgorithm
-from pp3d.algorithm.hybrid.pso_types import DynamicPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_ga_hybrid import HybridPSOAlgorithm
+from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 
 
-def init_algorithm_args() -> DynamicPSOAlgorithmArguments:
-    """Initialize Dynamic PSO algorithm arguments for the 3D Path Planning Playground.
+def init_algorithm_args() -> HybridPSOAlgorithmArguments:
+    """Initialize Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
 
     Returns:
-        DynamicPSOAlgorithmArguments: The Dynamic PSO algorithm arguments for the 3D Path Planning Playground.
+        HybridPSOAlgorithmArguments: The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
     """
-    with st.expander(label="Dynamic PSO Arguments", expanded=True):
+    with st.expander(label="Hybrid PSO Arguments", expanded=True):
         num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)
         num_waypoints = st.number_input("Number of Waypoints", min_value=2, max_value=50, value=4, step=1)
         max_iterations = st.number_input("Max Iterations", min_value=10, max_value=1000, value=100, step=10)
@@ -45,7 +45,7 @@ def init_algorithm_args() -> DynamicPSOAlgorithmArguments:
             "Random Seed (0 means None, for non-deterministic)", min_value=0, max_value=1000, value=0, step=1
         )
         verbose = st.checkbox("Verbose")
-        return DynamicPSOAlgorithmArguments(
+        return HybridPSOAlgorithmArguments(
             num_particles=num_particles,
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
@@ -64,34 +64,34 @@ def init_algorithm_args() -> DynamicPSOAlgorithmArguments:
 
 
 def run_algorithm(
-    args: DynamicPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
+    args: HybridPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
 ) -> tuple[np.ndarray, list[float], float]:
-    """Run the Dynamic PSO algorithm for the 3D Path Planning Playground.
+    """Run the Hybrid PSO algorithm for the 3D Path Planning Playground.
 
     Args:
-        args (DynamicPSOAlgorithmArguments): The Dynamic PSO algorithm arguments for the 3D Path Planning Playground.
+        args (HybridPSOAlgorithmArguments): The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
         fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
 
     Returns:
         tuple[np.ndarray, list[float], float]: The best path points, best fitness values, and the time cost.
     """
     start_time = time.perf_counter()
-    dynamic_pso = DynamicPSOAlgorithm(args, fitness_function)
-    best_path_points, best_fitness_values = dynamic_pso.run()
+    hybrid_pso = HybridPSOAlgorithm(args, fitness_function)
+    best_path_points, best_fitness_values = hybrid_pso.run()
     end_time = time.perf_counter()
     duration = end_time - start_time
     return best_path_points, best_fitness_values, duration
 
 
 def run_algorithm_multiple_times(
-    args: DynamicPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float], times: int = 100
+    args: HybridPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float], times: int = 100
 ) -> tuple[list[float], list[float]]:
-    """Run the Dynamic PSO algorithm for the 3D Path Planning Playground multiple times.
+    """Run the Hybrid PSO algorithm for the 3D Path Planning Playground multiple times.
 
     Args:
-        args (DynamicPSOAlgorithmArguments): The Dynamic PSO algorithm arguments for the 3D Path Planning Playground.
+        args (HybridPSOAlgorithmArguments): The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
         fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
-        times (int, optional): The number of times to run the Dynamic PSO algorithm. Defaults to 100.
+        times (int, optional): The number of times to run the Hybrid PSO algorithm. Defaults to 100.
 
     Returns:
         tuple[list[float], list[float]]: The best fitness values for each time, and the time cost for each time.
@@ -99,7 +99,7 @@ def run_algorithm_multiple_times(
     best_fitness_list: list[float] = []
     duration_list: list[float] = []
     for loop in range(times):
-        logger.info(f"Running Dynamic PSO algorithm multiple times, current progress {loop + 1}/{times}.")
+        logger.info(f"Running Hybrid PSO algorithm multiple times, current progress {loop + 1}/{times}.")
         _, best_fitness_values, duration = run_algorithm(args, fitness_function)
         best_fitness_list.append(best_fitness_values[-1])
         duration_list.append(duration)
