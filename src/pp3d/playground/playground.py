@@ -25,6 +25,8 @@ def _init_streamlit_session_state():
         st.session_state.run_selected_algorithm = False
     if "run_multiple_algorithms" not in st.session_state:
         st.session_state.run_multiple_algorithms = False
+    if "run_selected_algorithm_multiple_times" not in st.session_state:
+        st.session_state.run_selected_algorithm_multiple_times = False
 
 
 def _st_monaco_editor(value: str, language: str = "python", height: str = "480px", theme: str = "vs-dark") -> str:
@@ -85,13 +87,17 @@ class Playground:
             with st.expander(label="Fitness Function", expanded=False):
                 self.input_fitness_function_code = _st_monaco_editor(value=FITNESS_FUNCTION_CODE_TEMPLATE)
 
-            button_run_selected_algorithm_clicked = st.button(label="Run Selected Algorithm")
-            if button_run_selected_algorithm_clicked:
+            btn_run_selected_algorithm_clicked = st.button(label="Run Selected Algorithm")
+            if btn_run_selected_algorithm_clicked:
                 st.session_state.run_selected_algorithm = True
 
-            button_run_multiple_algorithms_clicked = st.button(label="Run Multiple Algorithms")
-            if button_run_multiple_algorithms_clicked:
+            btn_run_multiple_algorithms_clicked = st.button(label="Run Multiple Algorithms")
+            if btn_run_multiple_algorithms_clicked:
                 st.session_state.run_multiple_algorithms = True
+
+            btn_run_selected_algorithm_multiple_times_clicked = st.button(label="Run Selected Algorithm Multiple Times")
+            if btn_run_selected_algorithm_multiple_times_clicked:
+                st.session_state.run_selected_algorithm_multiple_times = True
 
     def _init_right_column(self) -> None:
         """Initialize the right column of the 3D Path Planning Playground."""
@@ -101,6 +107,8 @@ class Playground:
                 self._run_selected_algorithm()
             if st.session_state.run_multiple_algorithms:
                 self._run_multiple_algorithms()
+            if st.session_state.run_selected_algorithm_multiple_times:
+                self._run_selected_algorithm_multiple_times()
 
     def _parse_fitness_function(
         self, start_point: np.ndarray, destination: np.ndarray, xx: np.ndarray, yy: np.ndarray, zz: np.ndarray
@@ -201,25 +209,26 @@ class Playground:
         args = self.selected_algorithm_args
         best_path_points = np.array([])
         best_fitness_values = []
-        duration = 0.0
 
         if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
-            best_path_points, best_fitness_values, duration = pso_algorithm_playground.run_algorithm(
+            best_path_points, best_fitness_values, _ = pso_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
         elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
-            best_path_points, best_fitness_values, duration = genetic_algorithm_playground.run_algorithm(
+            best_path_points, best_fitness_values, _ = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function
             )
         elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
-            best_path_points, best_fitness_values, duration = pso_ga_hybrid_playground.run_algorithm(
+            best_path_points, best_fitness_values, _ = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function
             )
 
         full_path_points = np.vstack([start_point, best_path_points, destination])
 
         plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
-        plotly_utils.plot_fitness_curve(best_fitness_values)
+        plotly_utils.plot_line_chart(
+            values=best_fitness_values, title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness"
+        )
 
     def _run_multiple_algorithms(self) -> None:
         """Run multiple algorithms."""
@@ -343,6 +352,64 @@ class Playground:
 
         plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, algorithm_iteration_result)
         plotly_utils.plot_multiple_fitness_curves(algorithm_iteration_result)
+
+    def _run_selected_algorithm_multiple_times(self) -> None:
+        """Run the selected algorithm multiple times."""
+        st.session_state.run_selected_algorithm_multiple_times = True
+
+        if self.selected_algorithm_args is None:
+            st.error("Error running algorithm: self.selected_algorithm_args is None.")
+            return
+
+        start_point = np.array([0, 0, 5])
+        destination = np.array([90, 90, 5])
+
+        axes_min = self.selected_algorithm_args.axes_min
+        axes_max = self.selected_algorithm_args.axes_max
+        xx, yy, zz = self._generate_terrain(axes_min, axes_max)
+
+        callable_fitness_function = self._parse_fitness_function(start_point, destination, xx, yy, zz)
+
+        if callable_fitness_function is None:
+            st.error("Error running algorithm: callable_fitness_function is None.")
+            return
+
+        algorithm = self.selected_algorithm
+        args = self.selected_algorithm_args
+
+        best_fitness_list: list[float] = []
+        duration_list: list[float] = []
+        run_times = 10
+
+        if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
+            best_fitness_list, duration_list = pso_algorithm_playground.run_algorithm_multiple_times(
+                args, callable_fitness_function, run_times
+            )
+        elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
+            best_fitness_list, duration_list = genetic_algorithm_playground.run_algorithm_multiple_times(
+                args, callable_fitness_function, run_times
+            )
+        elif algorithm == "PSO-GA Hybrid" and isinstance(args, DynamicPSOAlgorithmArguments):
+            best_fitness_list, duration_list = pso_ga_hybrid_playground.run_algorithm_multiple_times(
+                args, callable_fitness_function, run_times
+            )
+
+        st.success(
+            f"Algorithm {algorithm}, "
+            f"max_fitness_value = {max(best_fitness_list):.2f}, "
+            f"min_fitness_value = {min(best_fitness_list):.2f}, "
+            f"avg_fitness_value = {sum(best_fitness_list) / len(best_fitness_list):.2f}, "
+            f"max_time_cost = {max(duration_list):.2f}, "
+            f"min_time_cost = {min(duration_list):.2f}, "
+            f"avg_time_cost = {sum(duration_list) / len(duration_list):.2f}"
+        )
+
+        plotly_utils.plot_line_chart(
+            values=best_fitness_list, title="Best Fitness Curve", xaxis_title="Loop", yaxis_title="Best Fitness"
+        )
+        plotly_utils.plot_line_chart(
+            values=duration_list, title="Time Cost Curve", xaxis_title="Loop", yaxis_title="Time Cost (seconds)"
+        )
 
 
 if __name__ == "__main__":

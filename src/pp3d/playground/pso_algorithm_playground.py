@@ -3,6 +3,7 @@ from collections.abc import Callable
 
 import numpy as np
 import streamlit as st
+from loguru import logger
 
 from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
@@ -70,3 +71,26 @@ def run_algorithm(
     end_time = time.perf_counter()
     duration = end_time - start_time
     return best_path_points, best_fitness_values, duration
+
+
+def run_algorithm_multiple_times(
+    args: PSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float], times: int = 100
+) -> tuple[list[float], list[float]]:
+    """Run the PSO algorithm for the 3D Path Planning Playground multiple times.
+
+    Args:
+        args (PSOAlgorithmArguments): The PSO algorithm arguments for the 3D Path Planning Playground.
+        fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
+        times (int, optional): The number of times to run the PSO algorithm. Defaults to 100.
+
+    Returns:
+        tuple[list[float], list[float]]: The best fitness values for each time, and the time cost for each time.
+    """
+    best_fitness_list: list[float] = []
+    duration_list: list[float] = []
+    for loop in range(times):
+        logger.info(f"Running PSO algorithm multiple times, current progress {loop + 1}/{times}.")
+        _, best_fitness_values, duration = run_algorithm(args, fitness_function)
+        best_fitness_list.append(best_fitness_values[-1])
+        duration_list.append(duration)
+    return best_fitness_list, duration_list

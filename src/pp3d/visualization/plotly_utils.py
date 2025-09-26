@@ -28,6 +28,20 @@ def _calculate_camera_eye(elev: float, azim: float, distance: float = 2.5) -> di
     return {"x": x, "y": y, "z": z}
 
 
+def plot_line_chart(values: list[float], title: str, xaxis_title: str, yaxis_title: str) -> None:
+    """Plot a line chart using Plotly.
+
+    Args:
+        values (list[float]): Values of each iteration.
+        title (str): Title of the line chart.
+        xaxis_title (str): Title of the x-axis.
+        yaxis_title (str): Title of the y-axis.
+    """
+    fig = graph_objects.Figure(data=[graph_objects.Scatter(y=values)])
+    fig.update_layout(title=title, xaxis_title=xaxis_title, yaxis_title=yaxis_title)
+    st.plotly_chart(fig, use_container_width=True)
+
+
 def plot_terrain_and_path(
     xx: np.ndarray,
     yy: np.ndarray,
@@ -192,17 +206,6 @@ def plot_terrain_and_multipath(
             "camera_eye": _calculate_camera_eye(elev=30, azim=240),
         },
     )
-    st.plotly_chart(fig, use_container_width=True)
-
-
-def plot_fitness_curve(fitness_values: list[float]) -> None:
-    """Plot the fitness curve using Plotly.
-
-    Args:
-        fitness_values (list[float]): Fitness values of each iteration.
-    """
-    fig = graph_objects.Figure(data=[graph_objects.Scatter(y=fitness_values)])
-    fig.update_layout(title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness")
     st.plotly_chart(fig, use_container_width=True)
 
 
