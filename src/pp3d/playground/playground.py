@@ -8,6 +8,7 @@ from streamlit_monaco_editor import st_monaco
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
+from pp3d.algorithm.types import AlgorithmArguments
 from pp3d.common import collision_detection, flight_angle_calculator, interpolate
 from pp3d.playground import (
     genetic_algorithm_playground,
@@ -44,6 +45,56 @@ def _st_monaco_editor(value: str, language: str = "python", height: str = "480px
     return st_monaco(value=value, language=language, height=height, theme=theme)
 
 
+def _init_common_algorithm_arguments() -> AlgorithmArguments:
+    """Initialize the common algorithm arguments.
+
+    Returns:
+        AlgorithmArguments: The common algorithm arguments.
+    """
+    with st.expander(label="Common Arguments", expanded=False):
+        num_waypoints = st.number_input(
+            "Number of Waypoints", key="num_waypoints", min_value=2, max_value=50, value=4, step=1
+        )
+        max_iterations = st.number_input(
+            "Max Iterations", key="max_iterations", min_value=10, max_value=1000, value=100, step=10
+        )
+        axes_min_x = st.number_input(
+            "Axis Min X", key="axes_min_x", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+        )
+        axes_min_y = st.number_input(
+            "Axis Min Y", key="axes_min_y", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+        )
+        axes_min_z = st.number_input(
+            "Axis Min Z", key="axes_min_z", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+        )
+        axes_max_x = st.number_input(
+            "Axis Max X", key="axes_max_x", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+        )
+        axes_max_y = st.number_input(
+            "Axis Max Y", key="axes_max_y", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+        )
+        axes_max_z = st.number_input(
+            "Axis Max Z", key="axes_max_z", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+        )
+        random_seed = st.number_input(
+            "Random Seed (0 means None, for non-deterministic)",
+            key="random_seed",
+            min_value=0,
+            max_value=1000,
+            value=0,
+            step=1,
+        )
+        verbose = st.checkbox("Verbose", key="verbose")
+        return AlgorithmArguments(
+            num_waypoints=num_waypoints,
+            max_iterations=max_iterations,
+            axes_min=(axes_min_x, axes_min_y, axes_min_z),
+            axes_max=(axes_max_x, axes_max_y, axes_max_z),
+            random_seed=random_seed if random_seed != 0 else None,
+            verbose=verbose,
+        )
+
+
 class Playground:
     """A class for the 3D Path Planning Playground."""
 
@@ -68,13 +119,24 @@ class Playground:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
             st.header("⚙️ Algorithm Settings")
+
             self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO-GA Hybrid"])
+            self.number_of_algorithm_runs = st.number_input(
+                label="Number of Algorithm Runs",
+                key="number_of_algorithm_runs",
+                min_value=100,
+                max_value=1000,
+                value=100,
+                step=100,
+            )
+            common_algorithm_args = _init_common_algorithm_arguments()
+
             if self.selected_algorithm == "PSO":
-                self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args()
+                self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args(common_algorithm_args)
             elif self.selected_algorithm == "GA":
-                self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args()
+                self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args(common_algorithm_args)
             elif self.selected_algorithm == "PSO-GA Hybrid":
-                self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args()
+                self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args(common_algorithm_args)
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
