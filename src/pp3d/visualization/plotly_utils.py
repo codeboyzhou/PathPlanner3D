@@ -3,7 +3,7 @@ import streamlit as st
 from plotly import graph_objects
 
 from pp3d.common import interpolate
-from pp3d.playground.types import AlgorithmIterationResult
+from pp3d.playground.types import MultiAlgorithmFusionResult
 
 
 def _calculate_camera_eye(elev: float, azim: float, distance: float = 2.5) -> dict:
@@ -107,7 +107,7 @@ def plot_terrain_and_multipath(
     zz: np.ndarray,
     start_point: np.ndarray,
     destination: np.ndarray,
-    algorithm_iteration_result: AlgorithmIterationResult,
+    multi_algorithm_fusion_result: MultiAlgorithmFusionResult,
 ) -> None:
     """Plot the terrain and multipath using Plotly.
 
@@ -117,7 +117,7 @@ def plot_terrain_and_multipath(
         zz: Z coordinates of the terrain.
         start_point: Start point of the path.
         destination: Destination of the path.
-        algorithm_iteration_result: Algorithm iteration result.
+        multi_algorithm_fusion_result: Multi-algorithm fusion result.
     """
     fig = graph_objects.Figure()
 
@@ -144,7 +144,7 @@ def plot_terrain_and_multipath(
     )
     fig.add_trace(destination_scatter)
 
-    pso_path_points = algorithm_iteration_result.pso_full_path_points
+    pso_path_points = multi_algorithm_fusion_result.pso_full_path_points
     pso_smooth_path_points = interpolate.smooth_path_with_cubic_spline(pso_path_points)
     pso_smooth_x, pso_smooth_y, pso_smooth_z = (
         pso_smooth_path_points[:, 0],
@@ -161,7 +161,7 @@ def plot_terrain_and_multipath(
     )
     fig.add_trace(pso_path)
 
-    ga_path_points = algorithm_iteration_result.ga_full_path_points
+    ga_path_points = multi_algorithm_fusion_result.ga_full_path_points
     ga_smooth_path_points = interpolate.smooth_path_with_cubic_spline(ga_path_points)
     ga_smooth_x, ga_smooth_y, ga_smooth_z = (
         ga_smooth_path_points[:, 0],
@@ -178,7 +178,7 @@ def plot_terrain_and_multipath(
     )
     fig.add_trace(ga_path)
 
-    pso_ga_hybrid_path_points = algorithm_iteration_result.pso_ga_hybrid_full_path_points
+    pso_ga_hybrid_path_points = multi_algorithm_fusion_result.pso_ga_hybrid_full_path_points
     pso_ga_hybrid_smooth_path_points = interpolate.smooth_path_with_cubic_spline(pso_ga_hybrid_path_points)
     pso_ga_hybrid_smooth_x, pso_ga_hybrid_smooth_y, pso_ga_hybrid_smooth_z = (
         pso_ga_hybrid_smooth_path_points[:, 0],
@@ -209,21 +209,21 @@ def plot_terrain_and_multipath(
     st.plotly_chart(fig, use_container_width=True)
 
 
-def plot_multiple_fitness_curves(algorithm_iteration_result: AlgorithmIterationResult) -> None:
+def plot_multiple_fitness_curves(multi_algorithm_fusion_result: MultiAlgorithmFusionResult) -> None:
     """Plot multiple fitness curves using Plotly.
 
     Args:
-        algorithm_iteration_result (AlgorithmIterationResult): Algorithm iteration result.
+        multi_algorithm_fusion_result (MultiAlgorithmFusionResult): Multi-algorithm fusion result.
     """
     fig = graph_objects.Figure()
 
-    pso_best_fitness_values = algorithm_iteration_result.pso_best_fitness_values
+    pso_best_fitness_values = multi_algorithm_fusion_result.pso_best_fitness_values
     fig.add_trace(graph_objects.Scatter(y=pso_best_fitness_values, name="PSO", line={"color": "#ff4848"}))
 
-    ga_best_fitness_values = algorithm_iteration_result.ga_best_fitness_values
+    ga_best_fitness_values = multi_algorithm_fusion_result.ga_best_fitness_values
     fig.add_trace(graph_objects.Scatter(y=ga_best_fitness_values, name="GA", line={"color": "springgreen"}))
 
-    pso_ga_hybrid_best_fitness_values = algorithm_iteration_result.pso_ga_hybrid_best_fitness_values
+    pso_ga_hybrid_best_fitness_values = multi_algorithm_fusion_result.pso_ga_hybrid_best_fitness_values
     fig.add_trace(
         graph_objects.Scatter(y=pso_ga_hybrid_best_fitness_values, name="PSO-GA Hybrid", line={"color": "yellow"})
     )

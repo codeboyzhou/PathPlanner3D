@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 import numpy as np
+import pandas
 import streamlit as st
 from scipy.ndimage import gaussian_filter
 from streamlit_monaco_editor import st_monaco
@@ -16,7 +17,7 @@ from pp3d.playground import (
     pso_ga_hybrid_playground,
 )
 from pp3d.playground.code_template import FITNESS_FUNCTION_CODE_TEMPLATE, TERRAIN_GENERATION_CODE_TEMPLATE
-from pp3d.playground.types import AlgorithmIterationResult
+from pp3d.playground.types import AlgorithmRunningResult, MultiAlgorithmFusionResult
 from pp3d.visualization import plotly_utils
 
 
@@ -26,8 +27,6 @@ def _init_streamlit_session_state():
         st.session_state.run_selected_algorithm = False
     if "run_multiple_algorithms" not in st.session_state:
         st.session_state.run_multiple_algorithms = False
-    if "run_selected_algorithm_multiple_times" not in st.session_state:
-        st.session_state.run_selected_algorithm_multiple_times = False
 
 
 def _st_monaco_editor(value: str, language: str = "python", height: str = "480px", theme: str = "vs-dark") -> str:
@@ -122,12 +121,7 @@ class Playground:
 
             self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO-GA Hybrid"])
             self.number_of_algorithm_runs = st.number_input(
-                label="Number of Algorithm Runs",
-                key="number_of_algorithm_runs",
-                min_value=100,
-                max_value=1000,
-                value=100,
-                step=100,
+                label="Number of Algorithm Runs", min_value=1, max_value=1000, value=100, step=100
             )
             common_algorithm_args = _init_common_algorithm_arguments()
 
@@ -157,20 +151,15 @@ class Playground:
             if btn_run_multiple_algorithms_clicked:
                 st.session_state.run_multiple_algorithms = True
 
-            btn_run_selected_algorithm_multiple_times_clicked = st.button(label="Run Selected Algorithm Multiple Times")
-            if btn_run_selected_algorithm_multiple_times_clicked:
-                st.session_state.run_selected_algorithm_multiple_times = True
-
     def _init_right_column(self) -> None:
         """Initialize the right column of the 3D Path Planning Playground."""
         with self.right:
             st.header("📊 Result Visualization")
-            if st.session_state.run_selected_algorithm:
-                self._run_selected_algorithm()
-            if st.session_state.run_multiple_algorithms:
-                self._run_multiple_algorithms()
-            if st.session_state.run_selected_algorithm_multiple_times:
-                self._run_selected_algorithm_multiple_times()
+            with st.spinner(text="Running algorithm...", show_time=True):
+                if st.session_state.run_selected_algorithm:
+                    self._run_selected_algorithm()
+                if st.session_state.run_multiple_algorithms:
+                    self._run_multiple_algorithms()
 
     def _parse_fitness_function(
         self, start_point: np.ndarray, destination: np.ndarray, xx: np.ndarray, yy: np.ndarray, zz: np.ndarray
@@ -269,28 +258,48 @@ class Playground:
 
         algorithm = self.selected_algorithm
         args = self.selected_algorithm_args
-        best_path_points = np.array([])
-        best_fitness_values = []
+        running_result = AlgorithmRunningResult(
+            best_path_points=np.array([]),
+            best_fitness_values=[],
+            best_fitness_value_samples=[],
+            running_time_samples=[],
+        )
 
         if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
-            best_path_points, best_fitness_values, _ = pso_algorithm_playground.run_algorithm(
-                args, callable_fitness_function
+            running_result = pso_algorithm_playground.run_algorithm(
+                args, callable_fitness_function, self.number_of_algorithm_runs
             )
         elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
-            best_path_points, best_fitness_values, _ = genetic_algorithm_playground.run_algorithm(
-                args, callable_fitness_function
+            running_result = genetic_algorithm_playground.run_algorithm(
+                args, callable_fitness_function, self.number_of_algorithm_runs
             )
         elif algorithm == "PSO-GA Hybrid" and isinstance(args, HybridPSOAlgorithmArguments):
-            best_path_points, best_fitness_values, _ = pso_ga_hybrid_playground.run_algorithm(
-                args, callable_fitness_function
+            running_result = pso_ga_hybrid_playground.run_algorithm(
+                args, callable_fitness_function, self.number_of_algorithm_runs
             )
 
-        full_path_points = np.vstack([start_point, best_path_points, destination])
-
-        plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
-        plotly_utils.plot_line_chart(
-            values=best_fitness_values, title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness"
-        )
+        # Only plot the fitness curve and path when times is 1.
+        if self.number_of_algorithm_runs == 1:
+            best_path_points = running_result.best_path_points
+            best_fitness_values = running_result.best_fitness_values
+            full_path_points = np.vstack([start_point, best_path_points, destination])
+            plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
+            plotly_utils.plot_line_chart(
+                values=best_fitness_values, title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness"
+            )
+        else:  # otherwise, show the table of fitness value samples and running time samples
+            best_fitness_value_samples = running_result.best_fitness_value_samples
+            running_time_samples = running_result.running_time_samples
+            table_data = pandas.DataFrame(
+                {
+                    "Max": [np.max(best_fitness_value_samples), np.max(running_time_samples)],
+                    "Min": [np.min(best_fitness_value_samples), np.min(running_time_samples)],
+                    "Avg": [np.mean(best_fitness_value_samples), np.mean(running_time_samples)],
+                    "Std": [np.std(best_fitness_value_samples, ddof=1), np.std(running_time_samples, ddof=1)],
+                },
+                index=["Best Fitness Value Samples", "Running Time Samples (seconds)"],
+            )
+            st.table(table_data)
 
     def _run_multiple_algorithms(self) -> None:
         """Run multiple algorithms."""
@@ -357,49 +366,45 @@ class Playground:
             st.error("Error running algorithm: callable_fitness_function is None.")
             return
 
-        pso_path_points, pso_fitness_values, pso_duration = pso_algorithm_playground.run_algorithm(
-            pso_algorithm_args, callable_fitness_function
-        )
-        ga_path_points, ga_fitness_values, ga_duration = genetic_algorithm_playground.run_algorithm(
-            ga_algorithm_args, callable_fitness_function
-        )
-        pso_ga_hybrid_path_points, pso_ga_hybrid_fitness_values, pso_ga_hybrid_duration = (
-            pso_ga_hybrid_playground.run_algorithm(pso_ga_hybrid_algorithm_args, callable_fitness_function)
+        pso_algorithm_result = pso_algorithm_playground.run_algorithm(pso_algorithm_args, callable_fitness_function)
+        ga_algorithm_result = genetic_algorithm_playground.run_algorithm(ga_algorithm_args, callable_fitness_function)
+        pso_ga_hybrid_algorithm_result = pso_ga_hybrid_playground.run_algorithm(
+            pso_ga_hybrid_algorithm_args, callable_fitness_function
         )
 
-        algorithm_iteration_result = AlgorithmIterationResult(
-            pso_full_path_points=np.vstack([start_point, pso_path_points, destination]),
-            ga_full_path_points=np.vstack([start_point, ga_path_points, destination]),
-            pso_ga_hybrid_full_path_points=np.vstack([start_point, pso_ga_hybrid_path_points, destination]),
-            pso_best_fitness_values=pso_fitness_values,
-            ga_best_fitness_values=ga_fitness_values,
-            pso_ga_hybrid_best_fitness_values=pso_ga_hybrid_fitness_values,
+        multi_algorithm_fusion_result = MultiAlgorithmFusionResult(
+            pso_full_path_points=np.vstack([start_point, pso_algorithm_result.best_path_points, destination]),
+            ga_full_path_points=np.vstack([start_point, ga_algorithm_result.best_path_points, destination]),
+            pso_ga_hybrid_full_path_points=np.vstack(
+                [start_point, pso_ga_hybrid_algorithm_result.best_path_points, destination]
+            ),
+            pso_best_fitness_values=pso_algorithm_result.best_fitness_values,
+            ga_best_fitness_values=ga_algorithm_result.best_fitness_values,
+            pso_ga_hybrid_best_fitness_values=pso_ga_hybrid_algorithm_result.best_fitness_values,
         )
 
         st.error(
-            f"PSO best fitness value = {pso_fitness_values[-1]:.2f}, "
+            f"PSO best fitness value = {pso_algorithm_result.best_fitness_values[-1]:.2f}, "
             f"num_particles = {pso_algorithm_args.num_particles}, "
             f"num_waypoints = {pso_algorithm_args.num_waypoints}, "
             f"max_iterations = {pso_algorithm_args.max_iterations}, "
             f"inertia_weight = {pso_algorithm_args.inertia_weight:.2f}, "
             f"cognitive_weight = {pso_algorithm_args.cognitive_weight:.2f}, "
             f"social_weight = {pso_algorithm_args.social_weight:.2f}, "
-            f"time cost = {pso_duration:.2f}s"
         )
 
         st.success(
-            f"GA best fitness value = {ga_fitness_values[-1]:.2f}, "
+            f"GA best fitness value = {ga_algorithm_result.best_fitness_values[-1]:.2f}, "
             f"population_size = {ga_algorithm_args.population_size}, "
             f"tournament_size = {ga_algorithm_args.tournament_size}, "
             f"num_waypoints = {ga_algorithm_args.num_waypoints}, "
             f"max_iterations = {ga_algorithm_args.max_iterations}, "
             f"crossover_rate = {ga_algorithm_args.crossover_rate:.2f}, "
             f"mutation_rate = {ga_algorithm_args.mutation_rate:.2f}, "
-            f"time cost = {ga_duration:.2f}s"
         )
 
         st.warning(
-            f"PSO-GA Hybrid best fitness value = {pso_ga_hybrid_fitness_values[-1]:.2f}, "
+            f"PSO-GA Hybrid best fitness value = {pso_ga_hybrid_algorithm_result.best_fitness_values[-1]:.2f}, "
             f"num_particles = {pso_ga_hybrid_algorithm_args.num_particles}, "
             f"num_waypoints = {pso_ga_hybrid_algorithm_args.num_waypoints}, "
             f"max_iterations = {pso_ga_hybrid_algorithm_args.max_iterations}, "
@@ -409,69 +414,10 @@ class Playground:
             f"cognitive_weight_max = {pso_ga_hybrid_algorithm_args.cognitive_weight_max:.2f}, "
             f"social_weight_min = {pso_ga_hybrid_algorithm_args.social_weight_min:.2f}, "
             f"social_weight_max = {pso_ga_hybrid_algorithm_args.social_weight_max:.2f}, "
-            f"time cost = {pso_ga_hybrid_duration:.2f}s"
         )
 
-        plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, algorithm_iteration_result)
-        plotly_utils.plot_multiple_fitness_curves(algorithm_iteration_result)
-
-    def _run_selected_algorithm_multiple_times(self) -> None:
-        """Run the selected algorithm multiple times."""
-        st.session_state.run_selected_algorithm_multiple_times = True
-
-        if self.selected_algorithm_args is None:
-            st.error("Error running algorithm: self.selected_algorithm_args is None.")
-            return
-
-        start_point = np.array([0, 0, 5])
-        destination = np.array([90, 90, 5])
-
-        axes_min = self.selected_algorithm_args.axes_min
-        axes_max = self.selected_algorithm_args.axes_max
-        xx, yy, zz = self._generate_terrain(axes_min, axes_max)
-
-        callable_fitness_function = self._parse_fitness_function(start_point, destination, xx, yy, zz)
-
-        if callable_fitness_function is None:
-            st.error("Error running algorithm: callable_fitness_function is None.")
-            return
-
-        algorithm = self.selected_algorithm
-        args = self.selected_algorithm_args
-
-        best_fitness_list: list[float] = []
-        duration_list: list[float] = []
-        run_times = 10
-
-        if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
-            best_fitness_list, duration_list = pso_algorithm_playground.run_algorithm_multiple_times(
-                args, callable_fitness_function, run_times
-            )
-        elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
-            best_fitness_list, duration_list = genetic_algorithm_playground.run_algorithm_multiple_times(
-                args, callable_fitness_function, run_times
-            )
-        elif algorithm == "PSO-GA Hybrid" and isinstance(args, HybridPSOAlgorithmArguments):
-            best_fitness_list, duration_list = pso_ga_hybrid_playground.run_algorithm_multiple_times(
-                args, callable_fitness_function, run_times
-            )
-
-        st.success(
-            f"Algorithm {algorithm}, "
-            f"max_fitness_value = {max(best_fitness_list):.2f}, "
-            f"min_fitness_value = {min(best_fitness_list):.2f}, "
-            f"avg_fitness_value = {sum(best_fitness_list) / len(best_fitness_list):.2f}, "
-            f"max_time_cost = {max(duration_list):.2f}, "
-            f"min_time_cost = {min(duration_list):.2f}, "
-            f"avg_time_cost = {sum(duration_list) / len(duration_list):.2f}"
-        )
-
-        plotly_utils.plot_line_chart(
-            values=best_fitness_list, title="Best Fitness Curve", xaxis_title="Loop", yaxis_title="Best Fitness"
-        )
-        plotly_utils.plot_line_chart(
-            values=duration_list, title="Time Cost Curve", xaxis_title="Loop", yaxis_title="Time Cost (seconds)"
-        )
+        plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, multi_algorithm_fusion_result)
+        plotly_utils.plot_multiple_fitness_curves(multi_algorithm_fusion_result)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from loguru import logger
 from pp3d.algorithm.hybrid.pso_ga_hybrid import HybridPSOAlgorithm
 from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.types import AlgorithmArguments
+from pp3d.playground.types import AlgorithmRunningResult
 
 
 def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> HybridPSOAlgorithmArguments:
@@ -54,43 +55,39 @@ def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> HybridPSOA
 
 
 def run_algorithm(
-    args: HybridPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float]
-) -> tuple[np.ndarray, list[float], float]:
+    args: HybridPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float], times: int = 1
+) -> AlgorithmRunningResult:
     """Run the Hybrid PSO algorithm for the 3D Path Planning Playground.
 
     Args:
         args (HybridPSOAlgorithmArguments): The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
         fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
+        times (int, optional): The number of times to run the Hybrid PSO algorithm. Defaults to 1.
 
     Returns:
-        tuple[np.ndarray, list[float], float]: The best path points, best fitness values, and the time cost.
+        AlgorithmRunningResult: The running result of the Hybrid PSO algorithm.
     """
-    start_time = time.perf_counter()
-    hybrid_pso = HybridPSOAlgorithm(args, fitness_function)
-    best_path_points, best_fitness_values = hybrid_pso.run()
-    end_time = time.perf_counter()
-    duration = end_time - start_time
-    return best_path_points, best_fitness_values, duration
+    best_path_points = np.array([])
+    best_fitness_values: list[float] = []
+    best_fitness_value_samples: list[float] = []
+    running_time_samples: list[float] = []
 
-
-def run_algorithm_multiple_times(
-    args: HybridPSOAlgorithmArguments, fitness_function: Callable[[np.ndarray], float], times: int = 100
-) -> tuple[list[float], list[float]]:
-    """Run the Hybrid PSO algorithm for the 3D Path Planning Playground multiple times.
-
-    Args:
-        args (HybridPSOAlgorithmArguments): The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
-        fitness_function (Callable[[np.ndarray], float]): The fitness function for the 3D Path Planning Playground.
-        times (int, optional): The number of times to run the Hybrid PSO algorithm. Defaults to 100.
-
-    Returns:
-        tuple[list[float], list[float]]: The best fitness values for each time, and the time cost for each time.
-    """
-    best_fitness_list: list[float] = []
-    duration_list: list[float] = []
     for loop in range(times):
-        logger.info(f"Running Hybrid PSO algorithm multiple times, current progress {loop + 1}/{times}.")
-        _, best_fitness_values, duration = run_algorithm(args, fitness_function)
-        best_fitness_list.append(best_fitness_values[-1])
-        duration_list.append(duration)
-    return best_fitness_list, duration_list
+        logger.info(f"Running Hybrid PSO algorithm, current progress {loop + 1}/{times}.")
+        start_time = time.perf_counter()
+
+        hybrid_pso = HybridPSOAlgorithm(args, fitness_function)
+        best_path_points, best_fitness_values = hybrid_pso.run()
+
+        end_time = time.perf_counter()
+        duration = end_time - start_time
+
+        best_fitness_value_samples.append(best_fitness_values[-1])
+        running_time_samples.append(duration)
+
+    return AlgorithmRunningResult(
+        best_path_points=best_path_points,
+        best_fitness_values=best_fitness_values,
+        best_fitness_value_samples=best_fitness_value_samples,
+        running_time_samples=running_time_samples,
+    )
