@@ -58,22 +58,22 @@ def _init_common_algorithm_arguments() -> AlgorithmArguments:
             "Max Iterations", key="max_iterations", min_value=10, max_value=1000, value=100, step=10
         )
         axes_min_x = st.number_input(
-            "Axis Min X", key="axes_min_x", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+            "Axis Min X", key="axes_min_x", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_min_y = st.number_input(
-            "Axis Min Y", key="axes_min_y", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+            "Axis Min Y", key="axes_min_y", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_min_z = st.number_input(
-            "Axis Min Z", key="axes_min_z", min_value=0.0, max_value=100.0, value=0.0, step=1.0
+            "Axis Min Z", key="axes_min_z", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_max_x = st.number_input(
-            "Axis Max X", key="axes_max_x", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+            "Axis Max X", key="axes_max_x", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         axes_max_y = st.number_input(
-            "Axis Max Y", key="axes_max_y", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+            "Axis Max Y", key="axes_max_y", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         axes_max_z = st.number_input(
-            "Axis Max Z", key="axes_max_z", min_value=0.0, max_value=100.0, value=100.0, step=1.0
+            "Axis Max Z", key="axes_max_z", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         random_seed = st.number_input(
             "Random Seed (0 means None, for non-deterministic)",
