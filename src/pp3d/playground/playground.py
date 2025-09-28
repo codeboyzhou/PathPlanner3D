@@ -291,7 +291,7 @@ class Playground:
             best_fitness_value_samples = running_result.best_fitness_value_samples
             running_time_samples = running_result.running_time_samples
             table_data = pandas.DataFrame(
-                {
+                data={
                     "Max": [np.max(best_fitness_value_samples), np.max(running_time_samples)],
                     "Min": [np.min(best_fitness_value_samples), np.min(running_time_samples)],
                     "Avg": [np.mean(best_fitness_value_samples), np.mean(running_time_samples)],
@@ -383,38 +383,50 @@ class Playground:
             pso_ga_hybrid_best_fitness_values=pso_ga_hybrid_algorithm_result.best_fitness_values,
         )
 
-        st.error(
-            f"PSO best fitness value = {pso_algorithm_result.best_fitness_values[-1]:.2f}, "
-            f"num_particles = {pso_algorithm_args.num_particles}, "
-            f"num_waypoints = {pso_algorithm_args.num_waypoints}, "
-            f"max_iterations = {pso_algorithm_args.max_iterations}, "
-            f"inertia_weight = {pso_algorithm_args.inertia_weight:.2f}, "
-            f"cognitive_weight = {pso_algorithm_args.cognitive_weight:.2f}, "
-            f"social_weight = {pso_algorithm_args.social_weight:.2f}, "
+        pso_result_table_data = pandas.DataFrame(
+            data={
+                "Best Fitness Value": [pso_algorithm_result.best_fitness_values[-1]],
+                "Particles": [pso_algorithm_args.num_particles],
+                "Waypoints": [pso_algorithm_args.num_waypoints],
+                "Max Iterations": [pso_algorithm_args.max_iterations],
+                "Inertia Weight": [pso_algorithm_args.inertia_weight],
+                "Cognitive Weight": [pso_algorithm_args.cognitive_weight],
+                "Social Weight": [pso_algorithm_args.social_weight],
+            },
+            index=["PSO"],
         )
+        st.table(pso_result_table_data)
 
-        st.success(
-            f"GA best fitness value = {ga_algorithm_result.best_fitness_values[-1]:.2f}, "
-            f"population_size = {ga_algorithm_args.population_size}, "
-            f"tournament_size = {ga_algorithm_args.tournament_size}, "
-            f"num_waypoints = {ga_algorithm_args.num_waypoints}, "
-            f"max_iterations = {ga_algorithm_args.max_iterations}, "
-            f"crossover_rate = {ga_algorithm_args.crossover_rate:.2f}, "
-            f"mutation_rate = {ga_algorithm_args.mutation_rate:.2f}, "
+        ga_result_table_data = pandas.DataFrame(
+            data={
+                "Best Fitness Value": [ga_algorithm_result.best_fitness_values[-1]],
+                "Population Size": [ga_algorithm_args.population_size],
+                "Tournament Size": [ga_algorithm_args.tournament_size],
+                "Waypoints": [ga_algorithm_args.num_waypoints],
+                "Max Iterations": [ga_algorithm_args.max_iterations],
+                "Crossover Rate": [ga_algorithm_args.crossover_rate],
+                "Mutation Rate": [ga_algorithm_args.mutation_rate],
+            },
+            index=["GA"],
         )
+        st.table(ga_result_table_data)
 
-        st.warning(
-            f"PSO-GA Hybrid best fitness value = {pso_ga_hybrid_algorithm_result.best_fitness_values[-1]:.2f}, "
-            f"num_particles = {pso_ga_hybrid_algorithm_args.num_particles}, "
-            f"num_waypoints = {pso_ga_hybrid_algorithm_args.num_waypoints}, "
-            f"max_iterations = {pso_ga_hybrid_algorithm_args.max_iterations}, "
-            f"inertia_weight_min = {pso_ga_hybrid_algorithm_args.inertia_weight_min:.2f}, "
-            f"inertia_weight_max = {pso_ga_hybrid_algorithm_args.inertia_weight_max:.2f}, "
-            f"cognitive_weight_min = {pso_ga_hybrid_algorithm_args.cognitive_weight_min:.2f}, "
-            f"cognitive_weight_max = {pso_ga_hybrid_algorithm_args.cognitive_weight_max:.2f}, "
-            f"social_weight_min = {pso_ga_hybrid_algorithm_args.social_weight_min:.2f}, "
-            f"social_weight_max = {pso_ga_hybrid_algorithm_args.social_weight_max:.2f}, "
+        pso_ga_hybrid_result_table_data = pandas.DataFrame(
+            data={
+                "Best Fitness Value": [pso_ga_hybrid_algorithm_result.best_fitness_values[-1]],
+                "Particles": [pso_ga_hybrid_algorithm_args.num_particles],
+                "Waypoints": [pso_ga_hybrid_algorithm_args.num_waypoints],
+                "Max Iterations": [pso_ga_hybrid_algorithm_args.max_iterations],
+                "Min Inertia Weight": [pso_ga_hybrid_algorithm_args.inertia_weight_min],
+                "Max Inertia Weight": [pso_ga_hybrid_algorithm_args.inertia_weight_max],
+                "Min Cognitive Weight": [pso_ga_hybrid_algorithm_args.cognitive_weight_min],
+                "Max Cognitive Weight": [pso_ga_hybrid_algorithm_args.cognitive_weight_max],
+                "Min Social Weight": [pso_ga_hybrid_algorithm_args.social_weight_min],
+                "Max Social Weight": [pso_ga_hybrid_algorithm_args.social_weight_max],
+            },
+            index=["PSO-GA Hybrid"],
         )
+        st.table(pso_ga_hybrid_result_table_data)
 
         plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, multi_algorithm_fusion_result)
         plotly_utils.plot_multiple_fitness_curves(multi_algorithm_fusion_result)
