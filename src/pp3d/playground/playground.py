@@ -299,7 +299,7 @@ class Playground:
                 },
                 index=["Best Fitness Value Samples", "Running Time Samples (seconds)"],
             )
-            st.table(table_data)
+            st.table(table_data.style.format(precision=6))
 
     def _run_multiple_algorithms(self) -> None:
         """Run multiple algorithms."""
@@ -395,7 +395,7 @@ class Playground:
             },
             index=["PSO"],
         )
-        st.table(pso_result_table_data)
+        st.table(pso_result_table_data.style.format(precision=6))
 
         ga_result_table_data = pandas.DataFrame(
             data={
@@ -409,7 +409,7 @@ class Playground:
             },
             index=["GA"],
         )
-        st.table(ga_result_table_data)
+        st.table(ga_result_table_data.style.format(precision=6))
 
         pso_ga_hybrid_result_table_data = pandas.DataFrame(
             data={
@@ -426,7 +426,7 @@ class Playground:
             },
             index=["PSO-GA Hybrid"],
         )
-        st.table(pso_ga_hybrid_result_table_data)
+        st.table(pso_ga_hybrid_result_table_data.style.format(precision=6))
 
         plotly_utils.plot_terrain_and_multipath(xx, yy, zz, start_point, destination, multi_algorithm_fusion_result)
         plotly_utils.plot_multiple_fitness_curves(multi_algorithm_fusion_result)
