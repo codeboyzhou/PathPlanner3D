@@ -345,10 +345,7 @@ class HybridPSOAlgorithm:
                 f"best fitness value = {self.global_best_fitness_value:.6f}"
             )
 
-            # Check if the fitness values converge
-            if algorithm_utils.check_fitness_convergence(best_fitness_values):
-                logger.warning("The fitness values show convergence, use genetic algorithm to optimize PSO")
-                self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
+            self._use_genetic_algorithm_to_optimize_pso(iteration + 1)
 
         logger.success(f"Hybrid PSO algorithm finished, best fitness value = {self.global_best_fitness_value:.6f}")
 
