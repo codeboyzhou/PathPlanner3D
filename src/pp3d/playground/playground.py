@@ -52,7 +52,7 @@ def _init_common_algorithm_arguments() -> AlgorithmArguments:
     """
     with st.expander(label="Common Arguments", expanded=False):
         num_waypoints = st.number_input(
-            "Number of Waypoints", key="num_waypoints", min_value=2, max_value=50, value=4, step=1
+            "Number of Waypoints", key="num_waypoints", min_value=1, max_value=50, value=4, step=1
         )
         max_iterations = st.number_input(
             "Max Iterations", key="max_iterations", min_value=10, max_value=1000, value=100, step=10
