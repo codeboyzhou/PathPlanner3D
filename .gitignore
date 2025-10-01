@@ -2,6 +2,7 @@
 .idea/
 
 # Python build files
+dist/
 *.egg-info/
 __pycache__/
 
