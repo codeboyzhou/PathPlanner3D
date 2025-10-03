@@ -4,13 +4,12 @@ import numpy as np
 import pandas
 import streamlit as st
 from scipy.ndimage import gaussian_filter
-from streamlit_monaco_editor import st_monaco
 
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.algorithm.types import AlgorithmArguments
-from pp3d.common import collision_detection, flight_angle_calculator, interpolate
+from pp3d.common import collision_detection, flight_angle_calculator, interpolate, streamlit_widgets
 from pp3d.playground import (
     genetic_algorithm_playground,
     pso_algorithm_playground,
@@ -27,21 +26,6 @@ def _init_streamlit_session_state():
         st.session_state.run_selected_algorithm = False
     if "run_multiple_algorithms" not in st.session_state:
         st.session_state.run_multiple_algorithms = False
-
-
-def _st_monaco_editor(value: str, language: str = "python", height: str = "480px", theme: str = "vs-dark") -> str:
-    """Create a Monaco editor widget in Streamlit.
-
-    Args:
-        value (str): The initial value of the editor.
-        language (str): The programming language for syntax highlighting.
-        height (str): The height of the editor.
-        theme (str): The theme of the editor.
-
-    Returns:
-        str: The code written in the editor.
-    """
-    return st_monaco(value=value, language=language, height=height, theme=theme)
 
 
 def _init_common_algorithm_arguments() -> AlgorithmArguments:
@@ -138,10 +122,10 @@ class Playground:
             st.header("💻 Code Editor")
 
             with st.expander(label="Terrain Generation", expanded=False):
-                self.input_terrain_generation_code = _st_monaco_editor(value=TERRAIN_GENERATION_CODE_TEMPLATE)
+                self.input_terrain_generation_code = streamlit_widgets.code_editor(TERRAIN_GENERATION_CODE_TEMPLATE)
 
             with st.expander(label="Fitness Function", expanded=False):
-                self.input_fitness_function_code = _st_monaco_editor(value=FITNESS_FUNCTION_CODE_TEMPLATE)
+                self.input_fitness_function_code = streamlit_widgets.code_editor(FITNESS_FUNCTION_CODE_TEMPLATE)
 
             btn_run_selected_algorithm_clicked = st.button(label="Run Selected Algorithm")
             if btn_run_selected_algorithm_clicked:
