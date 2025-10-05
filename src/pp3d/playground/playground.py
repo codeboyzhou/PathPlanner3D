@@ -84,7 +84,7 @@ class Playground:
     def __init__(self):
         """Initialize the 3D Path Planning Playground."""
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
-        self.left, self.middle, self.right = st.columns([2, 4, 4])
+        self.left, self.middle, self.right = st.columns([1, 5, 4])
 
         self.selected_algorithm: str = "PSO"
         self.selected_algorithm_args: (
@@ -101,7 +101,7 @@ class Playground:
     def _init_left_column(self) -> None:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
-            st.header("⚙️ Algorithm Settings")
+            st.header("⚙️ Settings")
 
             self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO-GA Hybrid"])
             self.number_of_algorithm_runs = st.number_input(
@@ -122,16 +122,20 @@ class Playground:
             st.header("💻 Code Editor")
 
             with st.expander(label="Terrain Generation", expanded=False):
-                self.input_terrain_generation_code = streamlit_widgets.code_editor(TERRAIN_GENERATION_CODE_TEMPLATE)
+                self.input_terrain_generation_code = streamlit_widgets.code_editor(
+                    value=TERRAIN_GENERATION_CODE_TEMPLATE, height=640
+                )
 
             with st.expander(label="Fitness Function", expanded=False):
-                self.input_fitness_function_code = streamlit_widgets.code_editor(FITNESS_FUNCTION_CODE_TEMPLATE)
+                self.input_fitness_function_code = streamlit_widgets.code_editor(
+                    value=FITNESS_FUNCTION_CODE_TEMPLATE, height=640
+                )
 
-            btn_run_selected_algorithm_clicked = st.button(label="Run Selected Algorithm")
+            btn_run_selected_algorithm_clicked = st.button(label="▶️ Run Selected Algorithm")
             if btn_run_selected_algorithm_clicked:
                 st.session_state.run_selected_algorithm = True
 
-            btn_run_multiple_algorithms_clicked = st.button(label="Run Multiple Algorithms")
+            btn_run_multiple_algorithms_clicked = st.button(label="🔄 Run Multiple Algorithms")
             if btn_run_multiple_algorithms_clicked:
                 st.session_state.run_multiple_algorithms = True
 
