@@ -8,6 +8,7 @@ from loguru import logger
 from pp3d.algorithm.hybrid.pso_ga_hybrid import HybridPSOAlgorithm
 from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.types import AlgorithmArguments
+from pp3d.playground import i18n
 from pp3d.playground.types import AlgorithmRunningResult
 
 
@@ -20,22 +21,38 @@ def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> HybridPSOA
     Returns:
         HybridPSOAlgorithmArguments: The Hybrid PSO algorithm arguments for the 3D Path Planning Playground.
     """
-    with st.expander(label="Hybrid PSO Arguments", expanded=True):
-        num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)
-        inertia_weight_min = st.number_input("Min Inertia Weight", min_value=0.1, max_value=2.0, value=0.4, step=0.1)
-        inertia_weight_max = st.number_input("Max Inertia Weight", min_value=0.1, max_value=2.0, value=0.9, step=0.1)
+    with st.expander(label=i18n.translate("pso_ga_hybrid_arguments"), expanded=True):
+        num_particles = st.number_input(
+            i18n.translate("number_of_particles"), min_value=10, max_value=100, value=50, step=10
+        )
+        inertia_weight_min = st.number_input(
+            i18n.translate("min_inertia_weight"), min_value=0.1, max_value=2.0, value=0.4, step=0.1
+        )
+        inertia_weight_max = st.number_input(
+            i18n.translate("max_inertia_weight"), min_value=0.1, max_value=2.0, value=0.9, step=0.1
+        )
         cognitive_weight_min = st.number_input(
-            "Min Cognitive Weight", min_value=0.1, max_value=2.5, value=0.5, step=0.1
+            i18n.translate("min_cognitive_weight"), min_value=0.1, max_value=2.5, value=0.5, step=0.1
         )
         cognitive_weight_max = st.number_input(
-            "Max Cognitive Weight", min_value=0.1, max_value=2.5, value=2.5, step=0.1
+            i18n.translate("max_cognitive_weight"), min_value=0.1, max_value=2.5, value=2.5, step=0.1
         )
-        social_weight_min = st.number_input("Min Social Weight", min_value=0.1, max_value=2.5, value=0.5, step=0.1)
-        social_weight_max = st.number_input("Max Social Weight", min_value=0.1, max_value=2.5, value=2.5, step=0.1)
-        with st.expander(label="Max Velocities", expanded=True):
-            max_velocity_x = st.number_input("Max Velocity X", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-            max_velocity_y = st.number_input("Max Velocity Y", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-            max_velocity_z = st.number_input("Max Velocity Z", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
+        social_weight_min = st.number_input(
+            i18n.translate("min_social_weight"), min_value=0.1, max_value=2.5, value=0.5, step=0.1
+        )
+        social_weight_max = st.number_input(
+            i18n.translate("max_social_weight"), min_value=0.1, max_value=2.5, value=2.5, step=0.1
+        )
+        with st.expander(label=i18n.translate("max_velocities"), expanded=True):
+            max_velocity_x = st.number_input(
+                i18n.translate("max_velocity_x"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
+            max_velocity_y = st.number_input(
+                i18n.translate("max_velocity_y"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
+            max_velocity_z = st.number_input(
+                i18n.translate("max_velocity_z"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
         return HybridPSOAlgorithmArguments(
             num_particles=num_particles,
             num_waypoints=common_algorithm_args.num_waypoints,

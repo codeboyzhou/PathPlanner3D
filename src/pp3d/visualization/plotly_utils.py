@@ -3,6 +3,7 @@ import streamlit as st
 from plotly import graph_objects
 
 from pp3d.common import interpolate
+from pp3d.playground import i18n
 from pp3d.playground.types import MultiAlgorithmFusionResult
 
 
@@ -60,7 +61,7 @@ def plot_terrain_and_path(
         destination: Destination of the path.
         path_points: Path points to be plotted, shape: (n, 3), i.e. [[x1, y1, z1], [x2, y2, z2], ...]
     """
-    terrain = graph_objects.Surface(x=xx, y=yy, z=zz, showscale=False, name="Terrain")
+    terrain = graph_objects.Surface(x=xx, y=yy, z=zz, showscale=False, name=i18n.translate("terrain"))
 
     start_point_scatter = graph_objects.Scatter3d(
         x=[start_point[0]],
@@ -68,7 +69,7 @@ def plot_terrain_and_path(
         z=[start_point[2]],
         mode="markers",
         marker={"size": 5, "color": "green"},
-        name="Start Point",
+        name=i18n.translate("start_point"),
     )
 
     destination_scatter = graph_objects.Scatter3d(
@@ -77,18 +78,23 @@ def plot_terrain_and_path(
         z=[destination[2]],
         mode="markers",
         marker={"size": 5, "color": "red"},
-        name="Destination",
+        name=i18n.translate("destination"),
     )
 
     smooth_path_points = interpolate.smooth_path_with_cubic_spline(path_points)
     smooth_x, smooth_y, smooth_z = smooth_path_points[:, 0], smooth_path_points[:, 1], smooth_path_points[:, 2]
     path = graph_objects.Scatter3d(
-        x=smooth_x, y=smooth_y, z=smooth_z, mode="lines", line={"width": 6, "color": "springgreen"}, name="Target Path"
+        x=smooth_x,
+        y=smooth_y,
+        z=smooth_z,
+        mode="lines",
+        line={"width": 6, "color": "springgreen"},
+        name=i18n.translate("target_path"),
     )
 
     fig = graph_objects.Figure(data=[terrain, path, start_point_scatter, destination_scatter])
     fig.update_layout(
-        title="Terrain and Path",
+        title=i18n.translate("terrain_and_path"),
         height=800,
         scene={
             "xaxis": {"title": "X", "dtick": 10},
@@ -121,7 +127,7 @@ def plot_terrain_and_multipath(
     """
     fig = graph_objects.Figure()
 
-    terrain = graph_objects.Surface(x=xx, y=yy, z=zz, showscale=False, name="Terrain")
+    terrain = graph_objects.Surface(x=xx, y=yy, z=zz, showscale=False, name=i18n.translate("terrain"))
     fig.add_trace(terrain)
 
     start_point_scatter = graph_objects.Scatter3d(
@@ -130,7 +136,7 @@ def plot_terrain_and_multipath(
         z=[start_point[2]],
         mode="markers",
         marker={"size": 5, "color": "green"},
-        name="Start Point",
+        name=i18n.translate("start_point"),
     )
     fig.add_trace(start_point_scatter)
 
@@ -140,7 +146,7 @@ def plot_terrain_and_multipath(
         z=[destination[2]],
         mode="markers",
         marker={"size": 5, "color": "red"},
-        name="Destination",
+        name=i18n.translate("destination"),
     )
     fig.add_trace(destination_scatter)
 
@@ -157,7 +163,7 @@ def plot_terrain_and_multipath(
         z=pso_smooth_z,
         mode="lines",
         line={"width": 6, "color": "#ff4848"},
-        name="PSO Path",
+        name=i18n.translate("pso_path"),
     )
     fig.add_trace(pso_path)
 
@@ -174,7 +180,7 @@ def plot_terrain_and_multipath(
         z=ga_smooth_z,
         mode="lines",
         line={"width": 6, "color": "springgreen"},
-        name="GA Path",
+        name=i18n.translate("ga_path"),
     )
     fig.add_trace(ga_path)
 
@@ -191,12 +197,12 @@ def plot_terrain_and_multipath(
         z=pso_ga_hybrid_smooth_z,
         mode="lines",
         line={"width": 6, "color": "yellow"},
-        name="PSO-GA Hybrid Path",
+        name=i18n.translate("pso_ga_hybrid_path"),
     )
     fig.add_trace(pso_ga_hybrid_path)
 
     fig.update_layout(
-        title="Terrain and Path",
+        title=i18n.translate("terrain_and_path"),
         height=800,
         scene={
             "xaxis": {"title": "X", "dtick": 10},
@@ -228,5 +234,9 @@ def plot_multiple_fitness_curves(multi_algorithm_fusion_result: MultiAlgorithmFu
         graph_objects.Scatter(y=pso_ga_hybrid_best_fitness_values, name="PSO-GA Hybrid", line={"color": "yellow"})
     )
 
-    fig.update_layout(title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness")
+    fig.update_layout(
+        title=i18n.translate("fitness_curve"),
+        xaxis_title=i18n.translate("iterations"),
+        yaxis_title=i18n.translate("fitness"),
+    )
     st.plotly_chart(fig, use_container_width=True)

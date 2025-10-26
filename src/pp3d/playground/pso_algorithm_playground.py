@@ -8,6 +8,7 @@ from loguru import logger
 from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.algorithm.types import AlgorithmArguments
+from pp3d.playground import i18n
 from pp3d.playground.types import AlgorithmRunningResult
 
 
@@ -20,15 +21,29 @@ def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> PSOAlgorit
     Returns:
         PSOAlgorithmArguments: The initialized PSO algorithm arguments for the 3D Path Planning Playground.
     """
-    with st.expander(label="PSO Arguments", expanded=True):
-        num_particles = st.number_input("Number of Particles", min_value=10, max_value=100, value=50, step=10)
-        inertia_weight = st.number_input("Inertia Weight", min_value=0.1, max_value=1.0, value=0.5, step=0.1)
-        cognitive_weight = st.number_input("Cognitive Weight", min_value=0.1, max_value=2.1, value=1.5, step=0.1)
-        social_weight = st.number_input("Social Weight", min_value=0.1, max_value=2.1, value=1.5, step=0.1)
-        with st.expander(label="Max Velocities", expanded=True):
-            max_velocity_x = st.number_input("Max Velocity X", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-            max_velocity_y = st.number_input("Max Velocity Y", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
-            max_velocity_z = st.number_input("Max Velocity Z", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
+    with st.expander(label=i18n.translate("pso_arguments"), expanded=True):
+        num_particles = st.number_input(
+            i18n.translate("number_of_particles"), min_value=10, max_value=100, value=50, step=10
+        )
+        inertia_weight = st.number_input(
+            i18n.translate("inertia_weight"), min_value=0.1, max_value=1.0, value=0.5, step=0.1
+        )
+        cognitive_weight = st.number_input(
+            i18n.translate("cognitive_weight"), min_value=0.1, max_value=2.1, value=1.5, step=0.1
+        )
+        social_weight = st.number_input(
+            i18n.translate("social_weight"), min_value=0.1, max_value=2.1, value=1.5, step=0.1
+        )
+        with st.expander(label=i18n.translate("max_velocities"), expanded=True):
+            max_velocity_x = st.number_input(
+                i18n.translate("max_velocity_x"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
+            max_velocity_y = st.number_input(
+                i18n.translate("max_velocity_y"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
+            max_velocity_z = st.number_input(
+                i18n.translate("max_velocity_z"), min_value=0.1, max_value=10.0, value=1.0, step=0.1
+            )
         return PSOAlgorithmArguments(
             num_particles=num_particles,
             num_waypoints=common_algorithm_args.num_waypoints,

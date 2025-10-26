@@ -12,6 +12,7 @@ from pp3d.algorithm.types import AlgorithmArguments
 from pp3d.common import collision_detection, flight_angle_calculator, interpolate, streamlit_widgets
 from pp3d.playground import (
     genetic_algorithm_playground,
+    i18n,
     pso_algorithm_playground,
     pso_ga_hybrid_playground,
 )
@@ -22,6 +23,8 @@ from pp3d.visualization import plotly_utils
 
 def _init_streamlit_session_state():
     """Initialize the session state of streamlit."""
+    if "selected_language" not in st.session_state:
+        st.session_state.selected_language = "en_US"
     if "run_selected_algorithm" not in st.session_state:
         st.session_state.run_selected_algorithm = False
     if "run_multiple_algorithms" not in st.session_state:
@@ -34,40 +37,40 @@ def _init_common_algorithm_arguments() -> AlgorithmArguments:
     Returns:
         AlgorithmArguments: The common algorithm arguments.
     """
-    with st.expander(label="Common Arguments", expanded=False):
+    with st.expander(label=i18n.translate("common_arguments"), expanded=False):
         num_waypoints = st.number_input(
-            "Number of Waypoints", key="num_waypoints", min_value=1, max_value=50, value=4, step=1
+            i18n.translate("number_of_waypoints"), key="num_waypoints", min_value=1, max_value=50, value=4, step=1
         )
         max_iterations = st.number_input(
-            "Max Iterations", key="max_iterations", min_value=10, max_value=1000, value=100, step=10
+            i18n.translate("max_iterations"), key="max_iterations", min_value=10, max_value=1000, value=100, step=10
         )
         axes_min_x = st.number_input(
-            "Axis Min X", key="axes_min_x", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
+            i18n.translate("axis_min_x"), key="axes_min_x", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_min_y = st.number_input(
-            "Axis Min Y", key="axes_min_y", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
+            i18n.translate("axis_min_y"), key="axes_min_y", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_min_z = st.number_input(
-            "Axis Min Z", key="axes_min_z", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
+            i18n.translate("axis_min_z"), key="axes_min_z", min_value=-100.0, max_value=100.0, value=0.0, step=1.0
         )
         axes_max_x = st.number_input(
-            "Axis Max X", key="axes_max_x", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
+            i18n.translate("axis_max_x"), key="axes_max_x", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         axes_max_y = st.number_input(
-            "Axis Max Y", key="axes_max_y", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
+            i18n.translate("axis_max_y"), key="axes_max_y", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         axes_max_z = st.number_input(
-            "Axis Max Z", key="axes_max_z", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
+            i18n.translate("axis_max_z"), key="axes_max_z", min_value=-100.0, max_value=100.0, value=100.0, step=1.0
         )
         random_seed = st.number_input(
-            "Random Seed (0 means None, for non-deterministic)",
+            i18n.translate("random_seed"),
             key="random_seed",
             min_value=0,
             max_value=1000,
             value=0,
             step=1,
         )
-        verbose = st.checkbox("Verbose", key="verbose")
+        verbose = st.checkbox(i18n.translate("verbose"), key="verbose")
         return AlgorithmArguments(
             num_waypoints=num_waypoints,
             max_iterations=max_iterations,
@@ -86,7 +89,7 @@ class Playground:
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
         self.left, self.middle, self.right = st.columns([1, 5, 4])
 
-        self.selected_algorithm: str = "PSO"
+        self.selected_algorithm: str = "pso_algorithm"
         self.selected_algorithm_args: (
             PSOAlgorithmArguments | GeneticAlgorithmArguments | HybridPSOAlgorithmArguments | None
         ) = None
@@ -101,49 +104,50 @@ class Playground:
     def _init_left_column(self) -> None:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
-            st.header("⚙️ Settings")
+            st.session_state.selected_language = streamlit_widgets.select_language()
 
-            self.selected_algorithm = st.selectbox("Select Algorithm", ["PSO", "GA", "PSO-GA Hybrid"])
+            st.header(f"⚙️ {i18n.translate('settings')}")
+            self.selected_algorithm = streamlit_widgets.select_algorithm()
             self.number_of_algorithm_runs = st.number_input(
-                label="Number of Algorithm Runs", min_value=1, max_value=1000, value=100, step=100
+                label=i18n.translate("number_of_algorithm_runs"), min_value=1, max_value=1000, value=100, step=100
             )
             common_algorithm_args = _init_common_algorithm_arguments()
 
-            if self.selected_algorithm == "PSO":
+            if self.selected_algorithm == "pso_algorithm":
                 self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args(common_algorithm_args)
-            elif self.selected_algorithm == "GA":
+            elif self.selected_algorithm == "genetic_algorithm":
                 self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args(common_algorithm_args)
-            elif self.selected_algorithm == "PSO-GA Hybrid":
+            elif self.selected_algorithm == "pso_ga_hybrid_algorithm":
                 self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args(common_algorithm_args)
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
         with self.middle:
-            st.header("💻 Code Editor")
+            st.header(f"💻 {i18n.translate('code_editor')}")
 
-            with st.expander(label="Terrain Generation", expanded=False):
+            with st.expander(label=i18n.translate("terrain_generation_function"), expanded=False):
                 self.input_terrain_generation_code = streamlit_widgets.code_editor(
                     value=TERRAIN_GENERATION_CODE_TEMPLATE, height=640
                 )
 
-            with st.expander(label="Fitness Function", expanded=False):
+            with st.expander(label=i18n.translate("algorithm_fitness_function"), expanded=False):
                 self.input_fitness_function_code = streamlit_widgets.code_editor(
                     value=FITNESS_FUNCTION_CODE_TEMPLATE, height=640
                 )
 
-            btn_run_selected_algorithm_clicked = st.button(label="▶️ Run Selected Algorithm")
+            btn_run_selected_algorithm_clicked = st.button(label=f"▶️ {i18n.translate('run_selected_algorithm')}")
             if btn_run_selected_algorithm_clicked:
                 st.session_state.run_selected_algorithm = True
 
-            btn_run_multiple_algorithms_clicked = st.button(label="🔄 Run Multiple Algorithms")
+            btn_run_multiple_algorithms_clicked = st.button(label=f"🔄 {i18n.translate('run_multiple_algorithms')}")
             if btn_run_multiple_algorithms_clicked:
                 st.session_state.run_multiple_algorithms = True
 
     def _init_right_column(self) -> None:
         """Initialize the right column of the 3D Path Planning Playground."""
         with self.right:
-            st.header("📊 Result Visualization")
-            with st.spinner(text="Running algorithm...", show_time=True):
+            st.header(f"📊 {i18n.translate('result_visualization')}")
+            with st.spinner(text=f"{i18n.translate('running_algorithm')}...", show_time=True):
                 if st.session_state.run_selected_algorithm:
                     self._run_selected_algorithm()
                 if st.session_state.run_multiple_algorithms:
@@ -244,7 +248,6 @@ class Playground:
             st.error("Error running algorithm: callable_fitness_function is None.")
             return
 
-        algorithm = self.selected_algorithm
         args = self.selected_algorithm_args
         running_result = AlgorithmRunningResult(
             best_path_points=np.array([]),
@@ -253,15 +256,15 @@ class Playground:
             running_time_samples=[],
         )
 
-        if algorithm == "PSO" and isinstance(args, PSOAlgorithmArguments):
+        if self.selected_algorithm == "pso_algorithm" and isinstance(args, PSOAlgorithmArguments):
             running_result = pso_algorithm_playground.run_algorithm(
                 args, callable_fitness_function, self.number_of_algorithm_runs
             )
-        elif algorithm == "GA" and isinstance(args, GeneticAlgorithmArguments):
+        elif self.selected_algorithm == "genetic_algorithm" and isinstance(args, GeneticAlgorithmArguments):
             running_result = genetic_algorithm_playground.run_algorithm(
                 args, callable_fitness_function, self.number_of_algorithm_runs
             )
-        elif algorithm == "PSO-GA Hybrid" and isinstance(args, HybridPSOAlgorithmArguments):
+        elif self.selected_algorithm == "pso_ga_hybrid_algorithm" and isinstance(args, HybridPSOAlgorithmArguments):
             running_result = pso_ga_hybrid_playground.run_algorithm(
                 args, callable_fitness_function, self.number_of_algorithm_runs
             )
@@ -273,19 +276,25 @@ class Playground:
             full_path_points = np.vstack([start_point, best_path_points, destination])
             plotly_utils.plot_terrain_and_path(xx, yy, zz, start_point, destination, full_path_points)
             plotly_utils.plot_line_chart(
-                values=best_fitness_values, title="Fitness Curve", xaxis_title="Iteration", yaxis_title="Fitness"
+                values=best_fitness_values,
+                title=i18n.translate("fitness_curve"),
+                xaxis_title=i18n.translate("iterations"),
+                yaxis_title=i18n.translate("fitness"),
             )
         else:  # otherwise, show the table of fitness value samples and running time samples
             best_fitness_value_samples = running_result.best_fitness_value_samples
             running_time_samples = running_result.running_time_samples
             table_data = pandas.DataFrame(
                 data={
-                    "Max": [np.max(best_fitness_value_samples), np.max(running_time_samples)],
-                    "Min": [np.min(best_fitness_value_samples), np.min(running_time_samples)],
-                    "Avg": [np.mean(best_fitness_value_samples), np.mean(running_time_samples)],
-                    "Std": [np.std(best_fitness_value_samples, ddof=1), np.std(running_time_samples, ddof=1)],
+                    i18n.translate("max"): [np.max(best_fitness_value_samples), np.max(running_time_samples)],
+                    i18n.translate("min"): [np.min(best_fitness_value_samples), np.min(running_time_samples)],
+                    i18n.translate("avg"): [np.mean(best_fitness_value_samples), np.mean(running_time_samples)],
+                    i18n.translate("std"): [
+                        np.std(best_fitness_value_samples, ddof=1),
+                        np.std(running_time_samples, ddof=1),
+                    ],
                 },
-                index=["Best Fitness Value Samples", "Running Time Samples (seconds)"],
+                index=[i18n.translate("best_fitness_value_samples"), i18n.translate("running_time_samples")],
             )
             st.table(table_data.style.format(precision=6))
 

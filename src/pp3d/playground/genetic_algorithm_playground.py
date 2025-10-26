@@ -8,6 +8,7 @@ from loguru import logger
 from pp3d.algorithm.genetic.genetic import GeneticAlgorithm
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
 from pp3d.algorithm.types import AlgorithmArguments
+from pp3d.playground import i18n
 from pp3d.playground.types import AlgorithmRunningResult
 
 
@@ -20,11 +21,13 @@ def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> GeneticAlg
     Returns:
         GeneticAlgorithmArguments: The initialized genetic algorithm arguments for the 3D Path Planning Playground.
     """
-    with st.expander(label="GA Arguments", expanded=True):
-        population_size = st.number_input("Population Size", min_value=1, max_value=1000, value=100, step=1)
-        tournament_size = st.number_input("Tournament Size", min_value=2, max_value=10, value=3, step=1)
-        crossover_rate = st.number_input("Crossover Rate", min_value=0.0, max_value=1.0, value=0.8)
-        mutation_rate = st.number_input("Mutation Rate", min_value=0.0, max_value=1.0, value=0.2)
+    with st.expander(label=i18n.translate("genetic_arguments"), expanded=True):
+        population_size = st.number_input(
+            i18n.translate("population_size"), min_value=1, max_value=1000, value=100, step=1
+        )
+        tournament_size = st.number_input(i18n.translate("tournament_size"), min_value=2, max_value=10, value=3, step=1)
+        crossover_rate = st.number_input(i18n.translate("crossover_rate"), min_value=0.0, max_value=1.0, value=0.8)
+        mutation_rate = st.number_input(i18n.translate("mutation_rate"), min_value=0.0, max_value=1.0, value=0.2)
         return GeneticAlgorithmArguments(
             population_size=population_size,
             tournament_size=tournament_size,
