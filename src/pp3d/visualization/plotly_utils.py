@@ -40,7 +40,7 @@ def plot_line_chart(values: list[float], title: str, xaxis_title: str, yaxis_tit
     """
     fig = graph_objects.Figure(data=[graph_objects.Scatter(y=values)])
     fig.update_layout(title=title, xaxis_title=xaxis_title, yaxis_title=yaxis_title)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def plot_terrain_and_path(
@@ -104,7 +104,7 @@ def plot_terrain_and_path(
             "camera_eye": _calculate_camera_eye(elev=30, azim=240),
         },
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def plot_terrain_and_multipath(
@@ -212,7 +212,7 @@ def plot_terrain_and_multipath(
             "camera_eye": _calculate_camera_eye(elev=30, azim=240),
         },
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def plot_multiple_fitness_curves(multi_algorithm_fusion_result: MultiAlgorithmFusionResult) -> None:
@@ -239,4 +239,4 @@ def plot_multiple_fitness_curves(multi_algorithm_fusion_result: MultiAlgorithmFu
         xaxis_title=i18n.translate("iterations"),
         yaxis_title=i18n.translate("fitness"),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
