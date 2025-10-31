@@ -87,7 +87,7 @@ class Playground:
     def __init__(self):
         """Initialize the 3D Path Planning Playground."""
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
-        self.left, self.middle, self.right = st.columns([1, 5, 4])
+        self.left, self.middle, self.right = st.columns([2, 4, 4])
 
         self.selected_algorithm: str = "pso_algorithm"
         self.selected_algorithm_args: (

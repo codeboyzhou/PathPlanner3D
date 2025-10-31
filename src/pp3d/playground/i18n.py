@@ -43,7 +43,7 @@ translation = {
         "algorithm_fitness_function": "Algorithm Fitness Function",
         "run_selected_algorithm": "Run Selected Algorithm",
         "run_multiple_algorithms": "One-Click Run Multiple Algorithms",
-        "result_visualization": "Experimental Results Visualization",
+        "result_visualization": "Results Visualization",
         "running_algorithm": "Running Algorithm",
         "best_fitness_value_samples": "Best Fitness Value Samples",
         "running_time_samples": "运行时间采样（秒）",
