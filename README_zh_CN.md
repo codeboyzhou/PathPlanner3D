@@ -1,3 +1,5 @@
+[简体中文](https://github.com/codeboyzhou/PathPlanner3D/blob/main/README_zh_CN.md) | [English](https://github.com/codeboyzhou/PathPlanner3D/blob/main/README.md)
+
 <p align="center">
   <img src="https://img.shields.io/pypi/pyversions/pp3d?color=brightgreen" alt="Python Versions">
   <a href="https://pypi.org/project/pp3d/"><img src="https://img.shields.io/pypi/v/pp3d?color=brightgreen" alt="PyPI Version"></a>
