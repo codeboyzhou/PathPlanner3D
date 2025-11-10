@@ -87,6 +87,8 @@ class Playground:
     def __init__(self):
         """Initialize the 3D Path Planning Playground."""
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
+        st.session_state.selected_language = streamlit_widgets.select_language()
+        self._init_tabs()
         self.left, self.middle, self.right = st.columns([2, 4, 4])
 
         self.selected_algorithm: str = "pso_algorithm"
@@ -101,11 +103,25 @@ class Playground:
         self._init_middle_column()
         self._init_right_column()
 
+    def _init_tabs(self) -> None:
+        """Initialize the tabs of the 3D Path Planning Playground."""
+        (
+            self.tab_settings,
+            self.tab_terrain_simulator,
+            self.tab_fitness_function_designer,
+            self.tab_result_visualization,
+        ) = st.tabs(
+            [
+                i18n.translate("settings"),
+                i18n.translate("terrain_simulator"),
+                i18n.translate("fitness_function_designer"),
+                i18n.translate("result_visualization"),
+            ]
+        )
+
     def _init_left_column(self) -> None:
         """Initialize the left column of the 3D Path Planning Playground."""
         with self.left:
-            st.session_state.selected_language = streamlit_widgets.select_language()
-
             st.header(f"⚙️ {i18n.translate('settings')}")
             self.selected_algorithm = streamlit_widgets.select_algorithm()
             self.number_of_algorithm_runs = st.number_input(

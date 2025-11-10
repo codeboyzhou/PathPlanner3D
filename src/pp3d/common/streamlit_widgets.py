@@ -30,8 +30,9 @@ def select_language() -> str:
         str: The selected language.
     """
     return st.selectbox(
-        label="Select Language",
-        label_visibility="hidden",
+        width=200,
+        label="Select Language / 选择语言",
+        help="Select the language you are familiar with / 选择你熟悉的语言",
         options=list(i18n.translation.keys()),
         format_func=lambda selected: i18n.language_names[selected],
     )
