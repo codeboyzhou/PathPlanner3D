@@ -50,3 +50,60 @@ def select_algorithm() -> str:
         options=list(i18n.algorithm_names.keys()),
         format_func=lambda selected: i18n.algorithm_names[selected][st.session_state.selected_language],
     )
+
+
+def input_multiple_runs() -> int:
+    """
+    Create a multiple runs number input widget in Streamlit.
+
+    Returns:
+        int: The input number of multiple runs.
+    """
+    return st.number_input(
+        label=i18n.translate("multiple_runs"),
+        help=i18n.translate("multiple_runs_help"),
+        min_value=1,
+        max_value=1000,
+        value=100,
+        step=100,
+    )
+
+
+def input_starting_point_coordinate() -> tuple[int, int, int]:
+    """
+    Create a starting point coordinate input widget in Streamlit.
+
+    Returns:
+        tuple[int, int, int]: The input coordinate of starting point.
+    """
+    with st.expander(label=i18n.translate("starting_point_coordinate"), expanded=True):
+        x = st.number_input(
+            label=i18n.translate("starting_point_coordinate_x"), min_value=0, max_value=1000, value=0, step=1
+        )
+        y = st.number_input(
+            label=i18n.translate("starting_point_coordinate_y"), min_value=0, max_value=1000, value=0, step=1
+        )
+        z = st.number_input(
+            label=i18n.translate("starting_point_coordinate_z"), min_value=0, max_value=1000, value=0, step=1
+        )
+        return x, y, z
+
+
+def input_ending_point_coordinate() -> tuple[int, int, int]:
+    """
+    Create an ending point coordinate input widget in Streamlit.
+
+    Returns:
+        tuple[int, int, int]: The input coordinate of ending point.
+    """
+    with st.expander(label=i18n.translate("ending_point_coordinate"), expanded=True):
+        x = st.number_input(
+            label=i18n.translate("ending_point_coordinate_x"), min_value=0, max_value=1000, value=100, step=1
+        )
+        y = st.number_input(
+            label=i18n.translate("ending_point_coordinate_y"), min_value=0, max_value=1000, value=100, step=1
+        )
+        z = st.number_input(
+            label=i18n.translate("ending_point_coordinate_z"), min_value=0, max_value=1000, value=10, step=1
+        )
+        return x, y, z

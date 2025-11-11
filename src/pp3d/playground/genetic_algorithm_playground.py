@@ -21,7 +21,7 @@ def init_algorithm_args(common_algorithm_args: AlgorithmArguments) -> GeneticAlg
     Returns:
         GeneticAlgorithmArguments: The initialized genetic algorithm arguments for the 3D Path Planning Playground.
     """
-    with st.expander(label=i18n.translate("genetic_arguments"), expanded=True):
+    with st.expander(label=i18n.translate("algorithm_specific_arguments"), expanded=True):
         population_size = st.number_input(
             i18n.translate("population_size"), min_value=1, max_value=1000, value=100, step=1
         )

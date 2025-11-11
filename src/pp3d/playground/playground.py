@@ -37,7 +37,7 @@ def _init_common_algorithm_arguments() -> AlgorithmArguments:
     Returns:
         AlgorithmArguments: The common algorithm arguments.
     """
-    with st.expander(label=i18n.translate("common_arguments"), expanded=False):
+    with st.expander(label=i18n.translate("algorithm_common_arguments"), expanded=True):
         num_waypoints = st.number_input(
             i18n.translate("number_of_waypoints"), key="num_waypoints", min_value=1, max_value=50, value=4, step=1
         )
@@ -89,7 +89,7 @@ class Playground:
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
         st.session_state.selected_language = streamlit_widgets.select_language()
         self._init_tabs()
-        self.left, self.middle, self.right = st.columns([2, 4, 4])
+        self.middle, self.right = st.columns([1, 1])
 
         self.selected_algorithm: str = "pso_algorithm"
         self.selected_algorithm_args: (
@@ -99,7 +99,6 @@ class Playground:
         self.input_fitness_function_code: str = FITNESS_FUNCTION_CODE_TEMPLATE
 
         _init_streamlit_session_state()
-        self._init_left_column()
         self._init_middle_column()
         self._init_right_column()
 
@@ -119,22 +118,30 @@ class Playground:
             ]
         )
 
-    def _init_left_column(self) -> None:
-        """Initialize the left column of the 3D Path Planning Playground."""
-        with self.left:
-            st.header(f"⚙️ {i18n.translate('settings')}")
-            self.selected_algorithm = streamlit_widgets.select_algorithm()
-            self.number_of_algorithm_runs = st.number_input(
-                label=i18n.translate("number_of_algorithm_runs"), min_value=1, max_value=1000, value=100, step=100
-            )
-            common_algorithm_args = _init_common_algorithm_arguments()
+        self._init_tab_settings()
 
-            if self.selected_algorithm == "pso_algorithm":
-                self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args(common_algorithm_args)
-            elif self.selected_algorithm == "genetic_algorithm":
-                self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args(common_algorithm_args)
-            elif self.selected_algorithm == "pso_ga_hybrid_algorithm":
-                self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args(common_algorithm_args)
+    def _init_tab_settings(self) -> None:
+        """Initialize the settings tab of the 3D Path Planning Playground."""
+        with self.tab_settings:
+            common_settings_column, algorithm_common_args_column, algorithm_specific_args_column = st.columns([1, 1, 1])
+
+            with common_settings_column:
+                with st.expander(label=i18n.translate("common_settings"), expanded=True):
+                    self.selected_algorithm = streamlit_widgets.select_algorithm()
+                    self.multiple_runs = streamlit_widgets.input_multiple_runs()
+                    self.start_x, self.start_y, self.start_z = streamlit_widgets.input_starting_point_coordinate()
+                    self.end_x, self.end_y, self.end_z = streamlit_widgets.input_ending_point_coordinate()
+
+            with algorithm_common_args_column:
+                common_args = _init_common_algorithm_arguments()
+
+            with algorithm_specific_args_column:
+                if self.selected_algorithm == "pso_algorithm":
+                    self.selected_algorithm_args = pso_algorithm_playground.init_algorithm_args(common_args)
+                elif self.selected_algorithm == "genetic_algorithm":
+                    self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args(common_args)
+                elif self.selected_algorithm == "pso_ga_hybrid_algorithm":
+                    self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args(common_args)
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""
@@ -273,20 +280,16 @@ class Playground:
         )
 
         if self.selected_algorithm == "pso_algorithm" and isinstance(args, PSOAlgorithmArguments):
-            running_result = pso_algorithm_playground.run_algorithm(
-                args, callable_fitness_function, self.number_of_algorithm_runs
-            )
+            running_result = pso_algorithm_playground.run_algorithm(args, callable_fitness_function, self.multiple_runs)
         elif self.selected_algorithm == "genetic_algorithm" and isinstance(args, GeneticAlgorithmArguments):
             running_result = genetic_algorithm_playground.run_algorithm(
-                args, callable_fitness_function, self.number_of_algorithm_runs
+                args, callable_fitness_function, self.multiple_runs
             )
         elif self.selected_algorithm == "pso_ga_hybrid_algorithm" and isinstance(args, HybridPSOAlgorithmArguments):
-            running_result = pso_ga_hybrid_playground.run_algorithm(
-                args, callable_fitness_function, self.number_of_algorithm_runs
-            )
+            running_result = pso_ga_hybrid_playground.run_algorithm(args, callable_fitness_function, self.multiple_runs)
 
         # Only plot the fitness curve and path when times is 1.
-        if self.number_of_algorithm_runs == 1:
+        if self.multiple_runs == 1:
             best_path_points = running_result.best_path_points
             best_fitness_values = running_result.best_fitness_values
             full_path_points = np.vstack([start_point, best_path_points, destination])
