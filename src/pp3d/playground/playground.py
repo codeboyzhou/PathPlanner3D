@@ -29,6 +29,8 @@ def _init_streamlit_session_state():
         st.session_state.run_selected_algorithm = False
     if "run_multiple_algorithms" not in st.session_state:
         st.session_state.run_multiple_algorithms = False
+    if "run_terrain_generation_function" not in st.session_state:
+        st.session_state.run_terrain_generation_function = False
 
 
 def _init_common_algorithm_arguments() -> AlgorithmArguments:
@@ -88,7 +90,6 @@ class Playground:
         """Initialize the 3D Path Planning Playground."""
         st.set_page_config(page_title="3D Path Planning Playground", page_icon="🚢", layout="wide")
         st.session_state.selected_language = streamlit_widgets.select_language()
-        self._init_tabs()
         self.middle, self.right = st.columns([1, 1])
 
         self.selected_algorithm: str = "pso_algorithm"
@@ -99,8 +100,7 @@ class Playground:
         self.input_fitness_function_code: str = FITNESS_FUNCTION_CODE_TEMPLATE
 
         _init_streamlit_session_state()
-        self._init_middle_column()
-        self._init_right_column()
+        self._init_tabs()
 
     def _init_tabs(self) -> None:
         """Initialize the tabs of the 3D Path Planning Playground."""
@@ -119,6 +119,7 @@ class Playground:
         )
 
         self._init_tab_settings()
+        self._init_tab_terrain_simulator()
 
     def _init_tab_settings(self) -> None:
         """Initialize the settings tab of the 3D Path Planning Playground."""
@@ -142,6 +143,28 @@ class Playground:
                     self.selected_algorithm_args = genetic_algorithm_playground.init_algorithm_args(common_args)
                 elif self.selected_algorithm == "pso_ga_hybrid_algorithm":
                     self.selected_algorithm_args = pso_ga_hybrid_playground.init_algorithm_args(common_args)
+
+    def _init_tab_terrain_simulator(self) -> None:
+        """Initialize the terrain simulator tab of the 3D Path Planning Playground."""
+        with self.tab_terrain_simulator:
+            terrain_generation_function_column, terrain_visualization_column = st.columns([1, 1])
+
+            with terrain_generation_function_column:
+                with st.expander(label=i18n.translate("terrain_generation_function"), expanded=True):
+                    self.input_terrain_generation_code = streamlit_widgets.code_editor(
+                        value=TERRAIN_GENERATION_CODE_TEMPLATE, height=640
+                    )
+
+            with terrain_visualization_column:
+                btn_run_terrain_generation_clicked = st.button(label=i18n.translate("run_terrain_generation_function"))
+                if btn_run_terrain_generation_clicked and self.selected_algorithm_args is not None:
+                    start_point = np.array([self.start_x, self.start_y, self.start_z])
+                    destination = np.array([self.end_x, self.end_y, self.end_z])
+                    path_points = np.vstack((start_point, destination))
+                    axes_min = self.selected_algorithm_args.axes_min
+                    axes_max = self.selected_algorithm_args.axes_max
+                    self.xx, self.yy, self.zz = self._generate_terrain(axes_min, axes_max)
+                    plotly_utils.plot_terrain_and_path(self.xx, self.yy, self.zz, start_point, destination, path_points)
 
     def _init_middle_column(self) -> None:
         """Initialize the middle column of the 3D Path Planning Playground."""

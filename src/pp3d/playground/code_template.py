@@ -1,6 +1,17 @@
 # The code template for terrain generation function
 TERRAIN_GENERATION_CODE_TEMPLATE = """
+# You can replace the default terrain generation code with your own.
+# Allowed python packages: numpy, scipy.ndimage.gaussian_filter
 def generate_terrain(xx: np.ndarray, yy: np.ndarray) -> np.ndarray:
+    \"""
+    Args:
+        xx (np.ndarray): The x coordinates of the grid points, 2D array.
+        yy (np.ndarray): The y coordinates of the grid points, 2D array.
+
+    Returns:
+        np.ndarray: The height map of the terrain, 2D array.
+    \"""
+    # You can adjust the parameters of the peaks to simulate different terrains
     peaks=[
         # (center_x, center_y, amplitude, radius)
         (20, 20, 5, 8),
