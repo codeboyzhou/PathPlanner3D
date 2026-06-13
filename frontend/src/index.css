@@ -1,0 +1,23 @@
+:root {
+  font-family: Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+  color: #344249;
+  background: #f4f7f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #17252b;
+  --muted-strong: #58676d;
+  --muted: #89959a;
+  --green: #168465;
+  --canvas: #f4f7f6;
+  --surface-hover: #f0f3f2;
+  --border: #dce2e1;
+  --border-soft: #e8eceb;
+}
+* { box-sizing: border-box; }
+html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
+button, input, textarea { letter-spacing: 0; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #4c9b84; outline-offset: 2px; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb { background: #c9d0ce; border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
