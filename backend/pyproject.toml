@@ -1,0 +1,56 @@
+[project]
+name = "path-planner-3d-workspace"
+version = "0.3.0"
+description = "PathPlanner3D backend workspace."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pre-commit>=4.3.0",
+    "pyright>=1.1.407",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+    "algorithm",
+    "api",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["C4", "E", "F", "I", "PERF", "UP"]
+ignore = ["PERF203"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "algorithm/tests",
+    "api/tests",
+]
+addopts = "--cov=pp3d --cov=pp3d_api --cov-report=term-missing"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.pyright]
+include = [
+    "algorithm/src",
+    "api/src",
+]
+extraPaths = [
+    "algorithm/src",
+    "api/src",
+]

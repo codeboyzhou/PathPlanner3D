@@ -1,79 +1,71 @@
-[简体中文](https://github.com/codeboyzhou/PathPlanner3D/blob/main/README_zh_CN.md) | [English](https://github.com/codeboyzhou/PathPlanner3D/blob/main/README.md)
+[简体中文](README_zh_CN.md) | English
 
-<p align="center">
-  <img src="https://img.shields.io/pypi/pyversions/pp3d?color=brightgreen" alt="Python Versions">
-  <a href="https://pypi.org/project/pp3d/"><img src="https://img.shields.io/pypi/v/pp3d?color=brightgreen" alt="PyPI Version"></a>
-  <a href="https://pypi.org/project/pp3d/"><img src="https://img.shields.io/pepy/dt/pp3d?label=pypi%20%7C%20downloads&color=brightgreen" alt="Pepy Total Downloads"/></a>
-</p>
+# PathPlanner3D
 
-## Overview
+PathPlanner3D is a terrain-aware 3D path-planning platform for algorithm research and product experimentation. The
+repository uses a React frontend and a Python backend organized as a `uv` workspace.
 
-**PathPlanner3D** is an open-source, Python-based framework for 3D path planning, specifically designed for research and experimentation. Its core philosophy is "terrain awareness", integrating various metaheuristic optimization algorithms: Genetic Algorithm (GA), Particle Swarm Optimization (PSO), and a hybrid PSO-GA, with an interactive simulation and visualization environment.
+## Repository Structure
 
-This framework aims to provide a flexible and extensible experimental platform for researchers and developers in fields like UAV trajectory planning. With its highly modular architecture, users can easily validate new algorithms, compare the performance of different strategies, and conduct intuitive visual analysis in dynamically generated 3D terrains.
-
-## Key Features
-
-*   **Multiple Optimization Algorithms**: Includes built-in Genetic Algorithm (GA), Particle Swarm Optimization (PSO), and an innovative hybrid PSO-GA, all with dynamic parameter tuning.
-*   **Terrain Awareness**: Ensures path feasibility in complex terrains through intelligent collision avoidance, featuring vertical height checks and horizontal obstacle detection (e.g. mountains).
-*   **Interactive Playground**: Built with Streamlit, it supports real-time parameter adjustments, parallel comparison of multiple algorithms, and dynamic code editing with instant feedback.
-*   **High-Quality 3D Visualization**: Uses Plotly to dynamically display 3D terrains, planned paths, and convergence curves, offering multi-angle views for analysis.
-*   **Modular and Extensible Architecture**: A clean, layered design ("algorithm-common-visualization-playground") makes it easy to add new algorithms, customize fitness functions, or extend to new scenarios.
-*   **Modern Engineering Practices**: Employs `pyproject.toml`, `uv` for dependency locking, and `pre-commit` for code quality assurance, ensuring project stability and maintainability.
-
-## Tech Stack
-
-The framework is built on a foundation of well-established libraries:
-*   **Core**: NumPy, SciPy, Pydantic, Loguru
-*   **Visualization**: Plotly
-*   **Interactive UI**: Streamlit
-*   **Development Tools**: `uv`, `pytest`, `ruff`, `pyright`, `pre-commit`
-
-## Installation
-
-**Prerequisites**: Python 3.12+
-
-We recommend using `uv` for dependency management to ensure a consistent environment.
-
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/codeboyzhou/PathPlanner3D.git
-    cd PathPlanner3D
-    ```
-
-2.  **Install dependencies (Recommended)**:
-    Use `uv` to sync dependencies.
-    ```bash
-    uv sync
-    ```
-
-3.  **Install dependencies (Alternative)**:
-    If you prefer using `pip`, you can perform an editable installation.
-    ```bash
-    pip install -e .
-    ```
-
-## Quick Start
-
-Activate the virtual environment:
-
-```bash
-.venv/Scripts/activate
+```text
+PathPlanner3D/
+├── backend/
+│   ├── api/                  FastAPI HTTP service (`pp3d-api`)
+│   ├── algorithm/            GA, PSO, PSO-GA and numerical utilities (`pp3d-core`)
+│   ├── pyproject.toml        uv workspace and shared Python tooling
+│   └── uv.lock               reproducible backend dependency lock
+└── frontend/                 React, Three.js, ECharts and Monaco
 ```
 
-Launch the Streamlit interactive playground with the following command:
+The algorithm package has no dependency on FastAPI, React, Streamlit or visualization libraries. The API package
+depends on the algorithm package through the local `uv` workspace.
+
+## Backend
+
+Requirements: Python 3.12+ and `uv`.
 
 ```bash
-streamlit run src/pp3d/playground/playground.py
+cd backend
+uv sync --all-packages
+uv run uvicorn pp3d_api.main:app --reload
 ```
 
-After launching, a web interface will open automatically in your browser. You can:
-1.  Select an algorithm (e.g. `PSO`) from the left sidebar.
-2.  Adjust parameters like terrain, number of waypoints, and iterations.
-3.  Click the `Run` button to see the generated 3D path and fitness convergence curve on the right.
-4.  Try modifying the terrain generation logic or fitness function in the central code editor and observe the immediate impact on the results.
+The API is available at `http://127.0.0.1:8000`, with OpenAPI documentation at
+`http://127.0.0.1:8000/docs`.
 
-## Application Scenarios
+Main endpoints:
 
-*   **UAV Trajectory Planning**: Plan safe and efficient flight paths in complex environments like mountains or urban areas.
-*   **Academic Research & Education**: Serve as a visual platform for teaching algorithms, comparing performance, and validating new theories.
+- `GET /api/v1/health`
+- `GET /api/v1/algorithms`
+- `POST /api/v1/planner/run`
+- `POST /api/v1/planner/jobs`
+- `GET /api/v1/planner/jobs/{job_id}`
+- `GET /api/v1/planner/jobs/{job_id}/result`
+
+Planner jobs run on a dedicated single-worker queue because the current optimizers use NumPy's global random state.
+The queue accepts up to 32 waiting jobs and returns `429` when full. Requests whose estimated work
+(`particles * iterations * waypoints * runs * algorithms`) exceeds 2,000,000 units return `422`. Completed and failed
+jobs are retained for one hour, with at most 1,000 job records kept in memory.
+
+Run backend checks:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run pyright
+```
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite proxies `/api` requests to the local FastAPI server on port `8000`.
+
+## Current Status
+
+The backend now exposes real GA, PSO and PSO-GA execution. The React UI still uses its local simulator by default;
+connecting its run workflow to the asynchronous planner job endpoints is the next integration step.

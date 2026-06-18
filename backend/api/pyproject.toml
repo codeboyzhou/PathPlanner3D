@@ -1,0 +1,24 @@
+[project]
+name = "pp3d-api"
+version = "0.3.0"
+description = "FastAPI service for PathPlanner3D."
+requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [
+    { name = "codeboyzhou", email = "zhouchen9118@foxmail.com" },
+]
+dependencies = [
+    "fastapi>=0.115.0",
+    "pp3d-core",
+    "uvicorn[standard]>=0.34.0",
+]
+
+[tool.uv.sources]
+pp3d-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pp3d_api"]

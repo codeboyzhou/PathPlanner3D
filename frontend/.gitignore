@@ -1,5 +1,0 @@
-.vite/
-dist/
-node_modules/
-
-*.log

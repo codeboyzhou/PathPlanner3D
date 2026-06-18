@@ -6,7 +6,7 @@ dist/
 *.egg-info/
 __pycache__/
 
-# Coverage files
+# Python coverage files
 htmlcov/
 pytest/
 .coverage
@@ -14,3 +14,10 @@ coverage.xml
 
 # Jupyter Notebook files
 .ipynb_checkpoints/
+
+# Frontend build files
+.vite/
+node_modules/
+
+# Log files
+*.log
