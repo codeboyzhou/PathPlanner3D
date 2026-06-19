@@ -9,8 +9,8 @@ from uuid import uuid4
 import numpy as np
 from pp3d.algorithm.genetic.genetic import GeneticAlgorithm
 from pp3d.algorithm.genetic.types import GeneticAlgorithmArguments
-from pp3d.algorithm.hybrid.pso_ga_hybrid import HybridPSOAlgorithm
-from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_ga_hybrid import PSOGAHybridAlgorithm
+from pp3d.algorithm.hybrid.types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.pso import PSOAlgorithm
 from pp3d.algorithm.pso.types import PSOAlgorithmArguments
 from pp3d.common.flight_angle_calculator import calculate_slope_angles_batch
@@ -158,7 +158,7 @@ def _run_algorithm(request: PlannerRequest, algorithm: AlgorithmName) -> Algorit
             fitness_function,
         )
     else:
-        planner = HybridPSOAlgorithm(
+        planner = PSOGAHybridAlgorithm(
             HybridPSOAlgorithmArguments(
                 num_particles=request.particles,
                 inertia_weight_min=max(0.1, request.inertia - 0.2),

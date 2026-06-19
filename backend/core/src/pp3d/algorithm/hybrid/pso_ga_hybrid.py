@@ -4,14 +4,14 @@ from collections.abc import Callable
 import numpy as np
 from loguru import logger
 
-from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.types import HybridPSOAlgorithmArguments
 from pp3d.algorithm.pso.types import Particle
 from pp3d.common import algorithm_utils
 from pp3d.common.decorators import timer
 from pp3d.common.types import ProblemType
 
 
-class HybridPSOAlgorithm:
+class PSOGAHybridAlgorithm:
     """Hybrid Particle Swarm Optimization (PSO) algorithm."""
 
     def __init__(

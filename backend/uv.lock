@@ -447,14 +447,14 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.137.2" },
-    { name = "pp3d-core", editable = "algorithm" },
+    { name = "pp3d-core", editable = "core" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.49.0" },
 ]
 
 [[package]]
 name = "pp3d-core"
 version = "0.3.0"
-source = { editable = "algorithm" }
+source = { editable = "core" }
 dependencies = [
     { name = "loguru" },
     { name = "numpy" },

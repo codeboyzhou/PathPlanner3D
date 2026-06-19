@@ -11,7 +11,7 @@ repository uses a React frontend and a Python backend organized as a `uv` worksp
 PathPlanner3D/
 ├── backend/
 │   ├── api/                  FastAPI HTTP service (`pp3d-api`)
-│   ├── algorithm/            GA, PSO, PSO-GA and numerical utilities (`pp3d-core`)
+│   ├── core/                 GA, PSO, PSO-GA and numerical utilities (`pp3d-core`)
 │   ├── pyproject.toml        uv workspace and shared Python tooling
 │   └── uv.lock               reproducible backend dependency lock
 └── frontend/                 React, Three.js, ECharts and Monaco

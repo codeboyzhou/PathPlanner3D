@@ -1,6 +1,6 @@
 import numpy as np
-from pp3d.algorithm.hybrid.pso_ga_hybrid import HybridPSOAlgorithm
-from pp3d.algorithm.hybrid.pso_types import HybridPSOAlgorithmArguments
+from pp3d.algorithm.hybrid.pso_ga_hybrid import PSOGAHybridAlgorithm
+from pp3d.algorithm.hybrid.types import HybridPSOAlgorithmArguments
 
 
 def fitness_function(x: np.ndarray) -> float:
@@ -24,7 +24,7 @@ def test_run() -> None:
         random_seed=42,
     )
 
-    planner = HybridPSOAlgorithm(args, fitness_function)
+    planner = PSOGAHybridAlgorithm(args, fitness_function)
     path, convergence = planner.run()
 
     assert path.shape == (args.num_waypoints, 3)

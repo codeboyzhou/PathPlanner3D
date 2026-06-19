@@ -11,7 +11,7 @@ PathPlanner3D 是一个面向算法研究与产品实验的地形感知三维路
 PathPlanner3D/
 ├── backend/
 │   ├── api/                  FastAPI 接口服务（`pp3d-api`）
-│   ├── algorithm/            GA、PSO、PSO-GA 与数值工具（`pp3d-core`）
+│   ├── core/                 GA、PSO、PSO-GA 与数值工具（`pp3d-core`）
 │   ├── pyproject.toml        uv workspace 与共享 Python 工具配置
 │   └── uv.lock               后端统一依赖锁文件
 └── frontend/                 React、Three.js、ECharts、Monaco
